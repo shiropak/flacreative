@@ -11,117 +11,118 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast }) => {
 
   const getIcon = (type: ActivityType) => {
     switch (type) {
-      case ActivityType.FLIGHT: return 'fa-plane-departure';
+      case ActivityType.FLIGHT: return 'fa-plane';
       case ActivityType.FOOD: return 'fa-utensils';
-      case ActivityType.SIGHTSEEING: return 'fa-mountain-sun';
+      case ActivityType.SIGHTSEEING: return 'fa-camera';
       case ActivityType.SHOPPING: return 'fa-bag-shopping';
       case ActivityType.HOTEL: return 'fa-bed';
-      case ActivityType.ACTIVITY: return 'fa-person-walking';
+      case ActivityType.ACTIVITY: return 'fa-ticket';
       default: return 'fa-location-dot';
     }
   };
 
-  const getIconColor = (type: ActivityType) => {
+  // In dark mode, we use subtle backgrounds for icons
+  const getIconStyle = (type: ActivityType) => {
     switch (type) {
-      case ActivityType.FLIGHT: return 'text-sky-600 bg-sky-50';
-      case ActivityType.FOOD: return 'text-orange-600 bg-orange-50';
-      case ActivityType.SIGHTSEEING: return 'text-forest-700 bg-forest-50';
-      case ActivityType.HOTEL: return 'text-indigo-600 bg-indigo-50';
-      case ActivityType.SHOPPING: return 'text-amber-600 bg-amber-50';
-      default: return 'text-gray-500 bg-gray-50';
+      case ActivityType.FLIGHT: return 'text-blue-400 bg-blue-400/10';
+      case ActivityType.FOOD: return 'text-orange-400 bg-orange-400/10';
+      case ActivityType.SIGHTSEEING: return 'text-accent-lime bg-accent-lime/10';
+      case ActivityType.HOTEL: return 'text-purple-400 bg-purple-400/10';
+      case ActivityType.SHOPPING: return 'text-pink-400 bg-pink-400/10';
+      default: return 'text-gray-400 bg-gray-400/10';
     }
   };
 
   const hasDetails = activity.aiDescription || activity.mustEat?.length || activity.tips?.length || activity.location;
 
   return (
-    <div className="mb-5 relative group animate-slideUp">
+    <div className="mb-4 animate-slideUp">
       <div 
-        className={`bg-white rounded-[2rem] p-5 shadow-soft border border-transparent transition-all duration-300 ${expanded ? 'shadow-lg ring-1 ring-forest-100' : 'active:scale-[0.98]'}`}
+        className={`
+            bg-app-surface border border-app-border/50 rounded-[1.5rem] overflow-hidden transition-all duration-300
+            ${expanded ? 'ring-1 ring-accent-lime/50 shadow-glow' : 'active:scale-[0.99] hover:bg-app-surface2'}
+        `}
         onClick={() => hasDetails && setExpanded(!expanded)}
       >
-        <div className="flex items-start gap-4">
-          {/* Time & Icon Column */}
-          <div className="flex flex-col items-center gap-3 pt-1">
-             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${expanded ? 'bg-forest-900 text-white' : getIconColor(activity.type)}`}>
-               <i className={`fas ${getIcon(activity.type)} text-xl`}></i>
-             </div>
-             <span className="text-[11px] font-bold text-gray-400 font-mono tracking-wide">{activity.time}</span>
-          </div>
+        <div className="p-5 flex items-center gap-4">
+            {/* Icon Box */}
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${getIconStyle(activity.type)}`}>
+               <i className={`fas ${getIcon(activity.type)} text-lg`}></i>
+            </div>
 
-          {/* Content Column */}
-          <div className="flex-1 min-w-0 pt-1">
-             <div className="flex justify-between items-start">
-                <h3 className="font-bold text-gray-900 text-lg leading-tight tracking-tight">{activity.title}</h3>
-                {hasDetails && (
-                    <i className={`fas fa-chevron-down text-xs text-gray-300 mt-1.5 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}></i>
-                )}
-             </div>
-             
-             {activity.originalDescription && (
-               <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">{activity.originalDescription}</p>
-             )}
-
-            {/* Travel Time Badge - Only show if not expanded to save space, or keep if crucial */}
-            {!expanded && activity.estimatedTravelTime && (
-                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest-50 border border-forest-100/50">
-                    <i className="fas fa-route text-[10px] text-forest-600"></i>
-                    <span className="text-[10px] font-semibold text-forest-700">{activity.estimatedTravelTime}</span>
+            {/* Main Info */}
+            <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start mb-1">
+                    <h3 className="font-bold text-text-primary text-base truncate pr-2">{activity.title}</h3>
+                    <span className="font-mono text-xs font-bold text-accent-lime bg-accent-lime/10 px-2 py-1 rounded-lg whitespace-nowrap">
+                        {activity.time}
+                    </span>
+                </div>
+                <p className="text-sm text-text-secondary truncate">
+                    {activity.location || activity.originalDescription || 'Activity Details'}
+                </p>
+            </div>
+            
+             {/* Chevron */}
+             {hasDetails && (
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-app-surface2 transition-transform duration-300 ${expanded ? '-rotate-180' : ''}`}>
+                     <i className="fas fa-chevron-down text-xs text-text-muted"></i>
                 </div>
             )}
-          </div>
         </div>
 
         {/* Expanded Details */}
         {expanded && (
-          <div className="mt-6 pt-5 border-t border-gray-100 animate-fadeIn space-y-6">
+          <div className="px-5 pb-6 animate-fadeIn">
+            <div className="h-px w-full bg-app-border/50 mb-5"></div>
             
-            {/* AI Description */}
-            {activity.aiDescription && (
-                <div className="relative pl-4 border-l-2 border-forest-300">
-                    <p className="text-sm text-gray-600 italic leading-relaxed">
-                        "{activity.aiDescription}"
-                    </p>
+            {/* Travel Time Info */}
+            {activity.estimatedTravelTime && (
+                <div className="flex items-center gap-2 mb-4 text-xs text-text-secondary">
+                    <i className="fas fa-car-side"></i>
+                    <span>Drive: {activity.estimatedTravelTime}</span>
                 </div>
             )}
 
-            {/* Map Embed */}
+            {/* AI Description */}
+            {activity.aiDescription && (
+                <p className="text-sm text-text-primary leading-relaxed mb-5 font-light border-l-2 border-accent-lime pl-3">
+                    {activity.aiDescription}
+                </p>
+            )}
+
+            {/* Map Embed - Dark Mode Style */}
             {activity.location && (
-                <div className="rounded-2xl overflow-hidden shadow-inner bg-gray-100 h-40 relative map-grayscale">
+                <div className="mb-5 relative rounded-2xl overflow-hidden h-40 w-full map-dark bg-app-surface2">
                     <iframe
                         width="100%"
                         height="100%"
                         frameBorder="0"
                         style={{ border: 0 }}
-                        src={`https://maps.google.com/maps?q=${encodeURIComponent(activity.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                        src={`https://maps.google.com/maps?q=${encodeURIComponent(activity.location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
                         allowFullScreen
                     ></iframe>
-                    <div className="absolute bottom-2 right-2">
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location || '')}`, '_blank');
-                            }}
-                            className="bg-white/90 backdrop-blur text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm hover:bg-white text-gray-800 flex items-center gap-1"
-                        >
-                            <i className="fas fa-external-link-alt"></i> 開啟 App
-                        </button>
-                    </div>
+                     <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location || '')}`, '_blank');
+                        }}
+                        className="absolute bottom-3 right-3 bg-app-surface/90 backdrop-blur border border-app-border text-[10px] font-bold text-text-primary px-3 py-1.5 rounded-full flex items-center gap-1.5 hover:bg-app-surface2 transition-colors"
+                    >
+                        <i className="fas fa-map-marker-alt text-accent-lime"></i> Open Map
+                    </button>
                 </div>
             )}
 
-            {/* Grid for Information */}
-            <div className="grid grid-cols-1 gap-4">
+            {/* Tag Groups */}
+            <div className="space-y-4">
                 {/* Must Eat */}
                 {activity.mustEat && activity.mustEat.length > 0 && (
-                    <div className="bg-orange-50/50 rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                            <i className="fas fa-utensils text-orange-400 text-xs"></i>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">必吃推薦</p>
-                        </div>
+                    <div>
+                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Must Eat</p>
                         <div className="flex flex-wrap gap-2">
                             {activity.mustEat.map((item, idx) => (
-                                <span key={idx} className="px-2.5 py-1 bg-white text-gray-700 text-xs rounded-md font-medium shadow-sm border border-orange-100/50">
+                                <span key={idx} className="px-3 py-1.5 bg-orange-500/10 text-orange-300 border border-orange-500/20 text-xs rounded-lg font-medium">
                                     {item}
                                 </span>
                             ))}
@@ -129,38 +130,20 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast }) => {
                     </div>
                 )}
 
-                {/* Must Buy */}
-                {activity.mustBuy && activity.mustBuy.length > 0 && (
-                    <div className="bg-amber-50/50 rounded-xl p-3">
-                         <div className="flex items-center gap-2 mb-2">
-                            <i className="fas fa-shopping-basket text-amber-400 text-xs"></i>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">必買好物</p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {activity.mustBuy.map((item, idx) => (
-                                <span key={idx} className="px-2.5 py-1 bg-white text-gray-700 text-xs rounded-md font-medium shadow-sm border border-amber-100/50">
-                                    {item}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                 {/* Tips */}
+                {/* Tips */}
                  {activity.tips && activity.tips.length > 0 && (
-                    <div className="bg-forest-50/50 rounded-xl p-3">
-                         <div className="flex items-center gap-2 mb-2">
-                            <i className="fas fa-lightbulb text-forest-400 text-xs"></i>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">貼心提醒</p>
+                    <div>
+                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Pro Tips</p>
+                        <div className="bg-app-surface2 rounded-xl p-3 border border-app-border/50">
+                             <ul className="space-y-2">
+                                {activity.tips.map((item, idx) => (
+                                    <li key={idx} className="flex items-start gap-2.5">
+                                        <i className="fas fa-check-circle text-accent-lime text-xs mt-0.5"></i>
+                                        <span className="text-xs text-text-secondary leading-relaxed">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                        <ul className="space-y-2">
-                            {activity.tips.map((item, idx) => (
-                                <li key={idx} className="flex items-start gap-2">
-                                    <span className="w-1 h-1 rounded-full bg-forest-400 mt-1.5 flex-shrink-0"></span>
-                                    <span className="text-xs text-gray-600 leading-snug">{item}</span>
-                                </li>
-                            ))}
-                        </ul>
                     </div>
                 )}
             </div>

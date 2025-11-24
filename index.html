@@ -12,20 +12,21 @@
         theme: {
           extend: {
             colors: {
-              forest: {
-                900: '#0F281E', // Deepest Jungle Green
-                800: '#1A4D2E', // Brand Green
-                700: '#2F6A48',
-                600: '#408055',
-                500: '#52966A',
-                300: '#86C49D',
-                100: '#D1E9DB',
-                50: '#F2F9F5',
+              app: {
+                bg: '#0f0f11',       // Deepest Charcoal
+                surface: '#18181b',  // Card Background
+                surface2: '#27272a', // Lighter Card
+                border: '#3f3f46',   // Border
               },
-              nature: {
-                cream: '#FDFBF7',
-                stone: '#F4F4F4',
-                dark: '#1C1C1E',
+              accent: {
+                lime: '#bef264',     // Modern Lime (Book Now button style)
+                limeDark: '#a3e635',
+                cyan: '#22d3ee',
+              },
+              text: {
+                primary: '#ffffff',
+                secondary: '#a1a1aa',
+                muted: '#71717a',
               }
             },
             fontFamily: {
@@ -36,13 +37,12 @@
               '5xl': '2.5rem',
             },
             boxShadow: {
-              'soft': '0 10px 40px -10px rgba(0,0,0,0.06)',
-              'float': '0 20px 40px -5px rgba(0,0,0,0.15)',
-              'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+              'glow': '0 0 20px rgba(190, 242, 100, 0.15)',
+              'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
             },
             animation: {
               'fadeIn': 'fadeIn 0.5s ease-out forwards',
-              'slideUp': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'slideUp': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
             },
             keyframes: {
               fadeIn: {
@@ -60,11 +60,11 @@
     </script>
     <style>
       body {
-        background-color: #0F281E;
+        background-color: #0f0f11;
         font-family: 'Inter', 'Noto Sans TC', sans-serif;
         -webkit-tap-highlight-color: transparent;
         overscroll-behavior-y: none;
-        color: #1C1C1E;
+        color: #ffffff;
       }
       .no-scrollbar::-webkit-scrollbar {
           display: none;
@@ -74,17 +74,15 @@
           scrollbar-width: none;
       }
       .glass-nav {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        background: rgba(39, 39, 42, 0.8);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
       }
-      .sheet-container {
-        box-shadow: 0 -20px 50px rgba(0,0,0,0.3);
-      }
-      /* Map embed grayscale filter for aesthetic */
-      .map-grayscale iframe {
-        filter: grayscale(0.3) contrast(1.1);
+      /* Invert map for dark mode aesthetic */
+      .map-dark iframe {
+        filter: invert(100%) hue-rotate(180deg) brightness(0.8) contrast(0.9);
+        border-radius: 1rem;
       }
     </style>
   <script type="importmap">
