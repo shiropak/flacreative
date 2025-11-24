@@ -62,7 +62,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     dayLabel: 'Day 1',
     fullDate: '11.28',
     weatherRange: '17-21°C',
-    dressCode: '🩵 💙 淺藍 / 藍色',
+    dressCode: '白+淺藍',
     activities: [
       { 
         id: '1-1', time: '07:20', title: '出發：桃園國際機場', type: ActivityType.FLIGHT, location: 'Taoyuan International Airport', originalDescription: '中華航空 CI 851',
@@ -97,7 +97,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     dayLabel: 'Day 2',
     fullDate: '11.29',
     weatherRange: '17-20°C',
-    dressCode: '🤍 🤎 白色 / 咖啡色',
+    dressCode: '米白/大地色',
     activities: [
       { id: '2-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 15 min' },
       { 
@@ -129,7 +129,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     dayLabel: 'Day 3',
     fullDate: '11.30',
     weatherRange: '15-20°C',
-    dressCode: '🇹🇭 泰服 Dresscode',
+    dressCode: '泰服',
     activities: [
       { id: '3-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 15 min' },
       { 
@@ -155,7 +155,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     dayLabel: 'Day 4',
     fullDate: '12.01',
     weatherRange: '11-18°C',
-    dressCode: '💚 💚 綠色系',
+    dressCode: '綠色',
     activities: [
       { id: '4-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 1.5 hr' },
       { 
@@ -178,7 +178,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     dayLabel: 'Day 5',
     fullDate: '12.02',
     weatherRange: '9-12°C',
-    dressCode: '無 Dresscode',
+    dressCode: '無',
     activities: [
       { id: '5-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 20 min' },
       { id: '5-2', time: '11:25', title: '出發：清邁國際機場 (CI852)', type: ActivityType.FLIGHT, location: 'Chiang Mai International Airport', imageUrl: getImg('1569336685283-13b2287ebbb9'), estimatedTravelTime: '✈️' },

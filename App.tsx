@@ -156,7 +156,7 @@ const App: React.FC = () => {
                        </div>
                        <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
                             <i className="fas fa-tshirt text-accent-lime text-xs"></i>
-                            <span className="text-xs font-medium text-text-primary">{currentDay.dressCode.split(' ')[0]}</span>
+                            <span className="text-xs font-medium text-text-primary">{currentDay.dressCode}</span>
                        </div>
                   </div>
 

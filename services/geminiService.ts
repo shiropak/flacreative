@@ -2,7 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Activity } from "../types";
 
-const apiKey = process.env.API_KEY || '';
+// Use process.env.API_KEY if available, otherwise fallback to the user-provided key
+const apiKey = process.env.API_KEY || 'AIzaSyDSLxzewowQN4d5ZE955Veedke6_8diBNU';
 const ai = new GoogleGenAI({ apiKey });
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -112,15 +113,9 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
       const result = JSON.parse(text);
 
       // Step 2: Try Generate Image (Optional / Hybrid)
-      // To save quota and prevent broken images, we only generate if we strictly don't have a good one, 
-      // OR we random sample to demo the feature. 
-      // For now, let's try to generate one to satisfy the user's request, but fallback to current if fail.
-      // Note: Heavy usage here will hit 429. 
-      // Use a simplified check: 
+      // Only generate if explicitly requested to save quota, or use a hybrid approach (not enabled by default here to prevent rate limits)
       // const generatedImageBase64 = await generateImage(`Chiang Mai travel spot: ${activity.title}`);
-      // if (generatedImageBase64) {
-      //    result.imageUrl = generatedImageBase64;
-      // }
+      // if (generatedImageBase64) result.imageUrl = generatedImageBase64;
       
       if (Object.keys(result).length > 0) {
           localStorage.setItem(cacheKey, JSON.stringify(result));
