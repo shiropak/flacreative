@@ -1,3 +1,4 @@
+
 export enum ActivityType {
   FLIGHT = 'FLIGHT',
   FOOD = 'FOOD',
@@ -18,10 +19,12 @@ export interface Activity {
   imageUrl?: string; // New field for cover images
   
   // Enhanced fields from AI
-  aiDescription?: string;
-  mustEat?: string[]; // 必吃美食 / 必點菜單
-  mustBuy?: string[]; // 必買伴手禮
-  tips?: string[];    // 攻略 / 拍照點
+  aiDescription?: string; // 景點介紹
+  openingHours?: string;  // 營業時間
+  notes?: string[];       // 注意事項
+  mustEat?: string[];     // 必吃美食 / 必點菜單
+  mustBuy?: string[];     // 必買伴手禮
+  tips?: string[];        // 攻略 / 拍照點
   reservationInfo?: string; // 重要預約代號
   coordinates?: { lat: number; lng: number };
   estimatedTravelTime?: string; // Time from previous activity
@@ -32,6 +35,7 @@ export interface DaySchedule {
   dayLabel: string; // e.g., "Day 1"
   fullDate: string; // e.g., "11.28"
   weatherRange: string;
+  weatherIcon: string; // New field for specific weather icon class
   dressCode: string;
   activities: Activity[];
 }

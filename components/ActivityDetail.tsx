@@ -4,6 +4,7 @@ import { Activity, ActivityType } from '../types';
 
 interface ActivityDetailProps {
   activity: Activity;
+  weather: { temp: string; icon: string }; // Receive weather info from parent
   onClose: () => void;
 }
 
@@ -17,7 +18,7 @@ const FALLBACK_IMAGES: Record<string, string> = {
   'DEFAULT': 'https://images.unsplash.com/photo-1506665531195-3566aa2b4d43?auto=format&fit=crop&w=800&q=80'
 };
 
-const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) => {
+const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onClose }) => {
   const [mounted, setMounted] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -56,9 +57,13 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
             >
                 <i className="fas fa-arrow-left"></i>
             </button>
-            <button className="w-10 h-10 rounded-full bg-black/40 backdrop-blur text-white flex items-center justify-center border border-white/10">
-                <i className="far fa-heart"></i>
-            </button>
+            <div className="flex gap-3">
+                 {/* Weather Widget */}
+                 <div className="px-4 py-2 rounded-full bg-black/40 backdrop-blur border border-white/10 flex items-center gap-2">
+                     <span className="text-lg leading-none">{weather.icon}</span>
+                     <span className="text-white text-xs font-bold font-mono">{weather.temp}</span>
+                 </div>
+            </div>
         </div>
 
         {/* Title Overlay */}
@@ -76,9 +81,18 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
             <h1 className="text-4xl font-black text-white leading-tight shadow-black drop-shadow-lg">
                 {activity.title}
             </h1>
-            <div className="flex items-center gap-2 text-gray-300 mt-2 text-sm">
-                <i className="fas fa-map-marker-alt text-accent-lime"></i>
-                {activity.location || 'Chiang Mai'}
+            <div className="flex flex-col gap-2 mt-2">
+                <div className="flex items-center gap-2 text-gray-300 text-sm">
+                    <i className="fas fa-map-marker-alt text-accent-lime"></i>
+                    {activity.location || 'Chiang Mai'}
+                </div>
+                {/* Opening Hours Badge */}
+                {activity.openingHours && (
+                    <div className="flex items-center gap-2 text-text-secondary text-xs">
+                        <i className="far fa-clock text-accent-lime"></i>
+                        <span>{activity.openingHours}</span>
+                    </div>
+                )}
             </div>
         </div>
       </div>
@@ -86,14 +100,14 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
       {/* Content Body */}
       <div className="flex-1 bg-app-bg -mt-6 rounded-t-[2rem] relative z-10 px-6 pt-8 pb-20 space-y-8 min-h-[50vh]">
          
-         {/* AI Description */}
+         {/* Introduction (Description) */}
          {activity.aiDescription && (
              <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
                  <div className="flex items-center gap-2 mb-3 text-accent-lime">
-                     <i className="fas fa-robot"></i>
-                     <span className="text-xs font-bold uppercase tracking-wider">Guide Story</span>
+                     <i className="fas fa-circle-info"></i>
+                     <span className="text-xs font-bold uppercase tracking-wider">About</span>
                  </div>
-                 <p className="text-text-secondary leading-relaxed font-light">
+                 <p className="text-text-secondary leading-relaxed font-light text-justify">
                      {activity.aiDescription}
                  </p>
              </div>
@@ -102,10 +116,27 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
          {/* Important Reservation Info */}
          {activity.reservationInfo && (
              <div className="bg-red-500/10 p-5 rounded-2xl border border-red-500/20">
-                 <h3 className="text-red-400 font-bold mb-2 flex items-center gap-2">
-                     <i className="fas fa-exclamation-circle"></i> Important / Reservation
+                 <h3 className="text-red-400 font-bold mb-2 flex items-center gap-2 text-sm uppercase tracking-wider">
+                     <i className="fas fa-exclamation-circle"></i> Reservation
                  </h3>
                  <p className="text-red-200 text-sm">{activity.reservationInfo}</p>
+             </div>
+         )}
+
+         {/* Notes & Cautions (New Section) */}
+         {activity.notes && activity.notes.length > 0 && (
+             <div className="bg-yellow-500/5 p-5 rounded-2xl border border-yellow-500/10">
+                 <h3 className="text-yellow-500 font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                     <i className="fas fa-triangle-exclamation"></i> 注意事項 (Notes)
+                 </h3>
+                 <ul className="space-y-2">
+                     {activity.notes.map((note, idx) => (
+                         <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary/80">
+                             <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-500/50 flex-shrink-0"></span>
+                             <span>{note}</span>
+                         </li>
+                     ))}
+                 </ul>
              </div>
          )}
 
@@ -119,7 +150,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
                          必吃美食 & 菜單
                      </h3>
                      <div className="flex flex-wrap gap-3">
-                         {activity.mustEat.map((item, idx) => (
+                         {activity.mustEat?.map((item, idx) => (
                              <span key={idx} className="px-4 py-2 bg-orange-500/10 text-orange-300 rounded-xl border border-orange-500/20 text-sm font-medium">
                                  {item}
                              </span>
@@ -136,7 +167,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
                          必買伴手禮
                      </h3>
                      <div className="flex flex-wrap gap-3">
-                         {activity.mustBuy.map((item, idx) => (
+                         {activity.mustBuy?.map((item, idx) => (
                              <span key={idx} className="px-4 py-2 bg-purple-500/10 text-purple-300 rounded-xl border border-purple-500/20 text-sm font-medium">
                                  {item}
                              </span>
@@ -153,7 +184,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
                          旅遊攻略
                      </h3>
                      <ul className="space-y-3">
-                         {activity.tips.map((tip, idx) => (
+                         {activity.tips?.map((tip, idx) => (
                              <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary">
                                  <i className="fas fa-check-circle text-accent-lime mt-1"></i>
                                  <span>{tip}</span>

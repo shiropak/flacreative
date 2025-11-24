@@ -7,7 +7,8 @@ const apiKey = 'AIzaSyDSLxzewowQN4d5ZE955Veedke6_8diBNU';
 const ai = new GoogleGenAI({ apiKey });
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-const CACHE_KEY_PREFIX = 'gemini_v8_'; 
+const CACHE_KEY_PREFIX = 'gemini_v9_'; // Bump version to force re-fetch with new prompt fields
+const WEATHER_CACHE_PREFIX = 'gemini_weather_v1_';
 
 export class QuotaExceededError extends Error {
   constructor(message: string) {
@@ -29,39 +30,78 @@ const safeLocalStorage = {
     }
 };
 
-// New Function: Generate Image using Nano Banana (Gemini 2.5 Flash Image)
-const generateImage = async (prompt: string): Promise<string | null> => {
+// Precise Forecast Data (Source: AccuWeather provided by user)
+const ACCUWEATHER_DATA: Record<string, { range: string, icon: string }> = {
+    '2025-11-28': { range: '12-27°C', icon: '🌤️' }, // Mostly sunny and nice
+    '2025-11-29': { range: '14-28°C', icon: '⛅' }, // Sunshine and a few clouds
+    '2025-11-30': { range: '17-29°C', icon: '☀️' }, // Plenty of sun
+    '2025-12-01': { range: '18-30°C', icon: '☀️' }, // Plenty of sun
+    '2025-12-02': { range: '19-31°C', icon: '⛅' }  // Clear to partly cloudy
+};
+
+// Function to predict weather for a specific date
+export const predictWeather = async (date: string): Promise<{ range: string, icon: string }> => {
+    // 1. Prioritize Manual Accurate Data for the specific trip
+    if (ACCUWEATHER_DATA[date]) {
+        return ACCUWEATHER_DATA[date];
+    }
+
+    if (!apiKey) return { range: '22-30°C', icon: '☀️' };
+
+    const cacheKey = `${WEATHER_CACHE_PREFIX}${date}`;
+    const cached = safeLocalStorage.getItem(cacheKey);
+    if (cached) {
+        try { return JSON.parse(cached); } catch(e) {}
+    }
+
+    const prompt = `
+        Predict the historical average weather for Chiang Mai, Thailand on the date: ${date}.
+        Return ONLY a JSON object with this structure:
+        {
+            "range": "High-Low°C" (e.g. "18-28°C"),
+            "icon": "Emoji" (Choose ONE from: ☀️, ⛅, 🌧️ based on historical rain probability)
+        }
+        Do not include markdown code blocks.
+    `;
+
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: {
-                parts: [{ text: `Create a high quality, photorealistic travel photography style image of: ${prompt}. No text overlay.` }]
-            },
+            model: 'gemini-2.5-flash',
+            contents: prompt,
             config: {
-                imageConfig: {
-                    aspectRatio: "16:9",
-                    imageSize: "1K"
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        range: { type: Type.STRING },
+                        icon: { type: Type.STRING }
+                    }
                 }
             }
         });
 
-        // Extract image from response parts
-        for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData && part.inlineData.data) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
+        let text = response.text || '{}';
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+            text = text.substring(firstBrace, lastBrace + 1);
         }
-        return null;
-    } catch (e) {
-        console.warn("Image generation failed", e);
-        return null;
+        
+        const result = JSON.parse(text);
+        if (result.range) {
+            safeLocalStorage.setItem(cacheKey, JSON.stringify(result));
+            return result;
+        }
+    } catch (error) {
+        console.warn('Weather prediction failed', error);
     }
+
+    return { range: '20-28°C', icon: '☀️' }; // Generic fallback
 };
 
 export const enrichActivity = async (activity: Activity, previousLocation?: string): Promise<Partial<Activity>> => {
   if (!apiKey) return {};
 
-  // Check Cache safely
   const cacheKey = `${CACHE_KEY_PREFIX}${activity.id}`;
   const cached = safeLocalStorage.getItem(cacheKey);
   if (cached) {
@@ -74,19 +114,20 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
 
   if (activity.type === 'FLIGHT' || activity.title.includes('早餐')) return {};
 
-  // 1. Text Enrichment
   const prompt = `
     你是專業的清邁導遊。分析行程："${activity.title}" (地點: ${activity.location || activity.title})。
     上一站是："${previousLocation || 'Chiang Mai Old City'}"。
     
     請回傳 JSON (繁體中文)：
-    1. aiDescription: 景點/餐廳故事 (有趣簡短, <40字)。
-    2. mustEat: 餐廳的「必點招牌菜」(如"冬陰功") 或 景點附近的「必吃小吃」，請列出具體菜名 2-3 個。
-    3. mustBuy: 必買伴手禮 (具體商品名，如"手標泰奶", "芒果乾")，若無則留空。
-    4. tips: 1-2個實用攻略 (如"建議傍晚去拍夕陽", "著裝需遮肩").
-    5. reservationInfo: 是否需預約？(簡短註明)。
-    6. estimatedTravelTime: 從上一站開車預估時間 (如 "約 20 分")。
-    7. coordinates: { lat, lng }
+    1. aiDescription: 景點/餐廳介紹 (約 80-100 字，包含歷史背景、特色或氛圍描述)。
+    2. openingHours: 營業時間 (例如 "09:00 - 18:00" 或 "24小時開放")，若不確定請估計。
+    3. notes: 注意事項 (列出 1-3 點，如 "需脫鞋", "禁止拍照", "蚊蟲多", "穿著需遮肩")。
+    4. mustEat: 餐廳的「必點招牌菜」或景點附近的「必吃小吃」(具體菜名 2-3 個)。
+    5. mustBuy: 必買伴手禮 (具體商品名)，若無則留空。
+    6. tips: 實用攻略 (如 "建議傍晚去", "最佳拍照點")。
+    7. reservationInfo: 是否需預約？(簡短註明)。
+    8. estimatedTravelTime: 從上一站開車預估時間 (如 "約 20 分")。
+    9. coordinates: { lat, lng }
   `;
 
   let retries = 0;
@@ -94,7 +135,6 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
 
   while (retries <= maxRetries) {
     try {
-      // Step 1: Get Text Info
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
@@ -104,6 +144,8 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
             type: Type.OBJECT,
             properties: {
               aiDescription: { type: Type.STRING },
+              openingHours: { type: Type.STRING },
+              notes: { type: Type.ARRAY, items: { type: Type.STRING } },
               mustEat: { type: Type.ARRAY, items: { type: Type.STRING } },
               mustBuy: { type: Type.ARRAY, items: { type: Type.STRING } },
               tips: { type: Type.ARRAY, items: { type: Type.STRING } },
@@ -122,24 +164,16 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
       });
 
       let text = response.text || '{}';
-      // Robust JSON Extraction: Find the first '{' and the last '}'
       const firstBrace = text.indexOf('{');
       const lastBrace = text.lastIndexOf('}');
-      
       if (firstBrace !== -1 && lastBrace !== -1) {
           text = text.substring(firstBrace, lastBrace + 1);
       } else {
-          // Fallback to basic cleaning
           text = text.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/```$/, '').trim();
       }
 
       const result = JSON.parse(text);
 
-      // Step 2: Try Generate Image (Optional / Hybrid)
-      // Only generate if explicitly requested to save quota, or use a hybrid approach (not enabled by default here to prevent rate limits)
-      // const generatedImageBase64 = await generateImage(`Chiang Mai travel spot: ${activity.title}`);
-      // if (generatedImageBase64) result.imageUrl = generatedImageBase64;
-      
       if (Object.keys(result).length > 0) {
           safeLocalStorage.setItem(cacheKey, JSON.stringify(result));
       }

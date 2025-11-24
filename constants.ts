@@ -61,7 +61,8 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     date: '2025-11-28',
     dayLabel: 'Day 1',
     fullDate: '11.28',
-    weatherRange: '17-21°C',
+    weatherRange: 'Loading...',
+    weatherIcon: '⏳', 
     dressCode: '白+淺藍',
     activities: [
       { 
@@ -96,7 +97,8 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     date: '2025-11-29',
     dayLabel: 'Day 2',
     fullDate: '11.29',
-    weatherRange: '17-20°C',
+    weatherRange: 'Loading...',
+    weatherIcon: '⏳',
     dressCode: '米白/大地色',
     activities: [
       { id: '2-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 15 min' },
@@ -128,7 +130,8 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     date: '2025-11-30',
     dayLabel: 'Day 3',
     fullDate: '11.30',
-    weatherRange: '15-20°C',
+    weatherRange: 'Loading...',
+    weatherIcon: '⏳',
     dressCode: '泰服',
     activities: [
       { id: '3-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 15 min' },
@@ -154,7 +157,8 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     date: '2025-12-01',
     dayLabel: 'Day 4',
     fullDate: '12.01',
-    weatherRange: '11-18°C',
+    weatherRange: 'Loading...',
+    weatherIcon: '⏳',
     dressCode: '綠色',
     activities: [
       { id: '4-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 1.5 hr' },
@@ -177,7 +181,8 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     date: '2025-12-02',
     dayLabel: 'Day 5',
     fullDate: '12.02',
-    weatherRange: '9-12°C',
+    weatherRange: 'Loading...',
+    weatherIcon: '⏳',
     dressCode: '無',
     activities: [
       { id: '5-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 20 min' },

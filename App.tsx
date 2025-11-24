@@ -5,7 +5,7 @@ import { DaySchedule, Activity } from './types';
 import ActivityCard from './components/ActivityCard';
 import ActivityDetail from './components/ActivityDetail';
 import InfoTab from './components/InfoTab';
-import { enrichActivity, QuotaExceededError } from './services/geminiService';
+import { enrichActivity, predictWeather, QuotaExceededError } from './services/geminiService';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'schedule' | 'info'>('schedule');
@@ -15,7 +15,7 @@ const App: React.FC = () => {
   
   const enrichmentStarted = useRef(false);
 
-  // AI Enrichment Logic
+  // Weather Prediction & AI Enrichment Logic
   useEffect(() => {
     const processEnrichment = async () => {
         if (enrichmentStarted.current) return;
@@ -23,6 +23,19 @@ const App: React.FC = () => {
 
         const newSchedule = [...schedule];
         
+        // 1. Predict Weather for each day
+        for (let i = 0; i < newSchedule.length; i++) {
+             // Always fetch prediction if it's the placeholder, or to ensure sync
+             if (newSchedule[i].weatherRange === 'Loading...' || newSchedule[i].weatherIcon === '⏳') {
+                 const prediction = await predictWeather(newSchedule[i].date);
+                 newSchedule[i].weatherRange = prediction.range;
+                 newSchedule[i].weatherIcon = prediction.icon;
+                 setSchedule([...newSchedule]); // Update UI immediately after each day resolves
+                 await new Promise(r => setTimeout(r, 300)); // Small delay for effect
+             }
+        }
+
+        // 2. Enrich Activities
         for (let dayIdx = 0; dayIdx < newSchedule.length; dayIdx++) {
             let previousLoc = "The Raintree Hotel Chiang Mai";
             if (dayIdx === 0) previousLoc = "Chiang Mai International Airport";
@@ -76,7 +89,6 @@ const App: React.FC = () => {
         }
     };
 
-    // Always run enrichment since we use the fallback key internally in service now
     processEnrichment();
   }, []);
 
@@ -94,6 +106,10 @@ const App: React.FC = () => {
       {selectedActivity && (
           <ActivityDetail 
               activity={selectedActivity} 
+              weather={{
+                temp: currentDay.weatherRange,
+                icon: currentDay.weatherIcon || '⛅'
+              }}
               onClose={() => setSelectedActivity(null)} 
           />
       )}
@@ -106,7 +122,9 @@ const App: React.FC = () => {
       <div className="relative z-10 pt-10 px-5 pb-2">
           <div className="flex justify-between items-start mb-6">
               <div>
-                  <h1 className="text-3xl font-extrabold tracking-tight mb-1">Travel Itinerary</h1>
+                  <div className="flex items-center gap-2 mb-1">
+                      <h1 className="text-3xl font-extrabold tracking-tight">Travel Itinerary</h1>
+                  </div>
                   <p className="text-text-secondary text-sm font-medium">Nov 28 - Dec 02 • Chiang Mai</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-app-surface border border-app-border flex items-center justify-center shadow-lg">
@@ -149,8 +167,8 @@ const App: React.FC = () => {
                             <i className="fas fa-calendar text-accent-lime text-xs"></i>
                             <span className="text-xs font-medium text-text-primary">{currentDay.fullDate}</span>
                        </div>
-                       <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
-                            <i className="fas fa-cloud-sun text-accent-lime text-xs"></i>
+                       <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap min-w-[5rem] justify-center transition-all duration-500">
+                            <span className="text-sm">{currentDay.weatherIcon}</span>
                             <span className="text-xs font-medium text-text-primary">{currentDay.weatherRange}</span>
                        </div>
                        <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
