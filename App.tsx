@@ -3,7 +3,7 @@ import { INITIAL_SCHEDULE } from './constants';
 import { DaySchedule } from './types';
 import ActivityCard from './components/ActivityCard';
 import InfoTab from './components/InfoTab';
-import { enrichActivity } from './services/geminiService';
+import { enrichActivity, QuotaExceededError } from './services/geminiService';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'schedule' | 'info'>('schedule');
@@ -39,30 +39,47 @@ const App: React.FC = () => {
             for (let actIdx = 0; actIdx < activities.length; actIdx++) {
                 const activity = activities[actIdx];
                 
-                // Skip if already enriched or simple items to save quota
-                if (activity.aiDescription || activity.type === 'FLIGHT') {
+                // Skip if already enriched (in state)
+                if (activity.aiDescription) {
                     if (activity.location) previousLoc = activity.location;
                     continue;
                 }
 
-                // Call API
-                const enriched = await enrichActivity(activity, previousLoc);
-                
-                // Update state immediately to show progress
-                activities[actIdx] = { ...activity, ...enriched };
-                newSchedule[dayIdx].activities = activities;
-                setSchedule([...newSchedule]);
-                
-                // Update location for next iteration
-                if (activities[actIdx].location) {
-                    previousLoc = activities[actIdx].location!;
-                }
+                try {
+                    const startTime = Date.now();
+                    
+                    // Call API (Handles caching internally now)
+                    const enriched = await enrichActivity(activity, previousLoc);
+                    const duration = Date.now() - startTime;
+                    
+                    if (Object.keys(enriched).length > 0) {
+                        activities[actIdx] = { ...activity, ...enriched };
+                        newSchedule[dayIdx].activities = activities;
+                        setSchedule([...newSchedule]);
+                    }
+                    
+                    // Update location for next iteration
+                    if (activities[actIdx].location) {
+                        previousLoc = activities[actIdx].location!;
+                    }
 
-                // Rate Limit Protection:
-                // Free tier is approx 15 RPM (1 req / 4 sec). 
-                // We wait 5 seconds to be safe. 
-                // The service also has retry logic for 429s.
-                await new Promise(r => setTimeout(r, 5000));
+                    // Smart Delay:
+                    // If duration < 500ms, it was likely cached. Don't wait long.
+                    // If duration > 500ms, it was an API call. Wait to respect rate limits.
+                    if (duration > 500) {
+                         await new Promise(r => setTimeout(r, 4000)); // 4s delay for fresh API calls
+                    } else {
+                         // Minimal delay for cached items to prevent UI freezing
+                         await new Promise(r => setTimeout(r, 50)); 
+                    }
+
+                } catch (error) {
+                    if (error instanceof QuotaExceededError) {
+                        console.warn("🛑 Daily Quota Exceeded. Stopping AI enrichment for this session to prevent errors.");
+                        return; // CRITICAL: Stop the entire function loops
+                    }
+                    console.error("Unexpected error in enrichment loop", error);
+                }
             }
         }
     };

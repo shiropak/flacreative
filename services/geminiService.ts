@@ -5,11 +5,28 @@ const apiKey = process.env.API_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const CACHE_KEY_PREFIX = 'gemini_enrich_cache_v3_'; // Increment version to clear old bad data if any
+
+export class QuotaExceededError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "QuotaExceededError";
+  }
+}
 
 export const enrichActivity = async (activity: Activity, previousLocation?: string): Promise<Partial<Activity>> => {
-  if (!apiKey) {
-    console.warn("No API Key found for Gemini");
-    return {};
+  if (!apiKey) return {};
+
+  // 1. Check LocalStorage Cache
+  // This prevents hitting the API for data we already have, saving massive amounts of quota.
+  const cacheKey = `${CACHE_KEY_PREFIX}${activity.id}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try {
+      return JSON.parse(cached);
+    } catch (e) {
+      localStorage.removeItem(cacheKey);
+    }
   }
 
   // Skip simple generic activities to save quota
@@ -32,7 +49,7 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
   `;
 
   let retries = 0;
-  const maxRetries = 3;
+  const maxRetries = 2; // Reduced retries to fail faster if quota is dead
 
   while (retries <= maxRetries) {
     try {
@@ -62,19 +79,29 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
       });
 
       const result = JSON.parse(response.text || '{}');
+      
+      // 2. Save to Cache on Success
+      if (Object.keys(result).length > 0) {
+          localStorage.setItem(cacheKey, JSON.stringify(result));
+      }
       return result;
 
     } catch (error: any) {
       const isRateLimit = error.message?.includes('429') || error.status === 'RESOURCE_EXHAUSTED' || error.code === 429;
       
-      if (isRateLimit && retries < maxRetries) {
-        const waitTime = 5000 * Math.pow(2, retries); // 5s, 10s, 20s
-        console.warn(`Quota limit hit for "${activity.title}". Retrying in ${waitTime/1000}s...`);
-        await delay(waitTime);
-        retries++;
+      if (isRateLimit) {
+        if (retries < maxRetries) {
+            const waitTime = 2000 * Math.pow(2, retries); 
+            console.warn(`Quota limit hit for "${activity.title}". Retrying in ${waitTime/1000}s...`);
+            await delay(waitTime);
+            retries++;
+        } else {
+            // Critical: Throw a specific error so the App loop can stop completely
+            throw new QuotaExceededError("Gemini API Quota Exceeded");
+        }
       } else {
         console.error(`Gemini enrichment failed for ${activity.title}`, error);
-        return {};
+        return {}; // Non-critical error, just return empty to keep app working
       }
     }
   }
