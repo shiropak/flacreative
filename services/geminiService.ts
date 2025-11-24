@@ -39,6 +39,17 @@ const ACCUWEATHER_DATA: Record<string, { range: string, icon: string }> = {
     '2025-12-02': { range: '19-31°C', icon: '⛅' }  // Clear to partly cloudy
 };
 
+const FALLBACK_ENRICHMENT = {
+    aiDescription: "暫無詳細資訊 (Description unavailable)",
+    openingHours: "依現場公告為準",
+    notes: [],
+    mustEat: [],
+    mustBuy: [],
+    tips: [],
+    reservationInfo: "",
+    estimatedTravelTime: ""
+};
+
 // Function to predict weather for a specific date
 export const predictWeather = async (date: string): Promise<{ range: string, icon: string }> => {
     // 1. Prioritize Manual Accurate Data for the specific trip
@@ -100,7 +111,7 @@ export const predictWeather = async (date: string): Promise<{ range: string, ico
 };
 
 export const enrichActivity = async (activity: Activity, previousLocation?: string): Promise<Partial<Activity>> => {
-  if (!apiKey) return {};
+  if (!apiKey) return FALLBACK_ENRICHMENT;
 
   const cacheKey = `${CACHE_KEY_PREFIX}${activity.id}`;
   const cached = safeLocalStorage.getItem(cacheKey);
@@ -112,7 +123,7 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
     }
   }
 
-  if (activity.type === 'FLIGHT' || activity.title.includes('早餐')) return {};
+  if (activity.type === 'FLIGHT' || activity.title.includes('早餐')) return FALLBACK_ENRICHMENT;
 
   const prompt = `
     你是專業的清邁導遊。分析行程："${activity.title}" (地點: ${activity.location || activity.title})。
@@ -174,10 +185,12 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
 
       const result = JSON.parse(text);
 
-      if (Object.keys(result).length > 0) {
+      if (Object.keys(result).length > 0 && result.aiDescription) {
           safeLocalStorage.setItem(cacheKey, JSON.stringify(result));
+          return result;
+      } else {
+        return FALLBACK_ENRICHMENT;
       }
-      return result;
 
     } catch (error: any) {
       const isRateLimit = error.message?.includes('429') || error.status === 'RESOURCE_EXHAUSTED' || error.code === 429;
@@ -192,9 +205,9 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
         }
       } else {
         console.error(`Gemini enrichment failed for ${activity.title}`, error);
-        return {}; 
+        return FALLBACK_ENRICHMENT; 
       }
     }
   }
-  return {};
+  return FALLBACK_ENRICHMENT;
 };

@@ -41,7 +41,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
   const hasEnrichedData = !!activity.aiDescription;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-app-bg flex flex-col overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-[100] bg-app-bg block overflow-y-auto animate-fadeIn">
       
       {/* Hero Image Area */}
       <div className="relative h-[50vh] w-full flex-shrink-0">
@@ -107,7 +107,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
       </div>
 
       {/* Content Body */}
-      <div className="flex-1 bg-app-bg -mt-6 rounded-t-[2rem] relative z-10 px-6 pt-8 pb-32 space-y-8 min-h-[50vh] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+      <div className="bg-app-bg -mt-6 rounded-t-[2rem] relative z-10 px-6 pt-8 pb-40 space-y-8 min-h-[50vh] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
          
          {/* Introduction (Description) */}
          <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
