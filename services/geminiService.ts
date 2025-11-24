@@ -2,8 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Activity } from "../types";
 
-// Use process.env.API_KEY if available, otherwise fallback to the user-provided key
-const apiKey = process.env.API_KEY || 'AIzaSyDSLxzewowQN4d5ZE955Veedke6_8diBNU';
+// DIRECT API KEY USAGE to prevent "process is not defined" crashes on some Vercel build configs
+const apiKey = 'AIzaSyDSLxzewowQN4d5ZE955Veedke6_8diBNU';
 const ai = new GoogleGenAI({ apiKey });
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -15,6 +15,19 @@ export class QuotaExceededError extends Error {
     this.name = "QuotaExceededError";
   }
 }
+
+// Safe LocalStorage Wrapper
+const safeLocalStorage = {
+    getItem: (key: string) => {
+        try { return localStorage.getItem(key); } catch (e) { return null; }
+    },
+    setItem: (key: string, value: string) => {
+        try { localStorage.setItem(key, value); } catch (e) { }
+    },
+    removeItem: (key: string) => {
+        try { localStorage.removeItem(key); } catch (e) { }
+    }
+};
 
 // New Function: Generate Image using Nano Banana (Gemini 2.5 Flash Image)
 const generateImage = async (prompt: string): Promise<string | null> => {
@@ -48,14 +61,14 @@ const generateImage = async (prompt: string): Promise<string | null> => {
 export const enrichActivity = async (activity: Activity, previousLocation?: string): Promise<Partial<Activity>> => {
   if (!apiKey) return {};
 
-  // Check Cache
+  // Check Cache safely
   const cacheKey = `${CACHE_KEY_PREFIX}${activity.id}`;
-  const cached = localStorage.getItem(cacheKey);
+  const cached = safeLocalStorage.getItem(cacheKey);
   if (cached) {
     try {
       return JSON.parse(cached);
     } catch (e) {
-      localStorage.removeItem(cacheKey);
+      safeLocalStorage.removeItem(cacheKey);
     }
   }
 
@@ -109,7 +122,17 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
       });
 
       let text = response.text || '{}';
-      text = text.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/```$/, '').trim();
+      // Robust JSON Extraction: Find the first '{' and the last '}'
+      const firstBrace = text.indexOf('{');
+      const lastBrace = text.lastIndexOf('}');
+      
+      if (firstBrace !== -1 && lastBrace !== -1) {
+          text = text.substring(firstBrace, lastBrace + 1);
+      } else {
+          // Fallback to basic cleaning
+          text = text.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/```$/, '').trim();
+      }
+
       const result = JSON.parse(text);
 
       // Step 2: Try Generate Image (Optional / Hybrid)
@@ -118,7 +141,7 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
       // if (generatedImageBase64) result.imageUrl = generatedImageBase64;
       
       if (Object.keys(result).length > 0) {
-          localStorage.setItem(cacheKey, JSON.stringify(result));
+          safeLocalStorage.setItem(cacheKey, JSON.stringify(result));
       }
       return result;
 

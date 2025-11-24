@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Activity, ActivityType } from '../types';
 
 interface ActivityCardProps {
@@ -9,6 +9,8 @@ interface ActivityCardProps {
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }) => {
+  const [imgError, setImgError] = useState(false);
+
   const getIcon = (type: ActivityType) => {
     switch (type) {
       case ActivityType.FLIGHT: return 'fa-plane-departure';
@@ -58,10 +60,19 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
              
              {/* Image Header (Full Width) */}
              <div className="w-full h-48 bg-app-surface2 relative overflow-hidden">
-                 {activity.imageUrl ? (
-                     <img src={activity.imageUrl} alt={activity.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                 {activity.imageUrl && !imgError ? (
+                     <img 
+                        src={activity.imageUrl} 
+                        alt={activity.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                        loading="lazy" 
+                        onError={() => setImgError(true)}
+                     />
                  ) : (
-                     <div className="w-full h-full flex items-center justify-center text-gray-600"><i className="fas fa-image text-3xl"></i></div>
+                     <div className="w-full h-full flex flex-col items-center justify-center text-gray-600 bg-app-surface3">
+                        <i className={`fas ${getIcon(activity.type)} text-3xl mb-2 opacity-50`}></i>
+                        <span className="text-xs text-text-muted">Image Unavailable</span>
+                     </div>
                  )}
                  
                  {/* Type Badge Overlay */}
@@ -84,14 +95,14 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
                     </p>
                  </div>
 
-                 {/* AI Tags Display Area */}
+                 {/* AI Tags Display Area - Safely Mapped */}
                  <div className="flex flex-wrap gap-2 mt-1">
-                     {activity.mustEat && activity.mustEat.slice(0, 3).map((food, i) => (
+                     {activity.mustEat?.slice(0, 3).map((food, i) => (
                          <span key={`food-${i}`} className="text-[10px] px-2 py-1 bg-orange-500/10 text-orange-300 rounded-md border border-orange-500/20 truncate max-w-full">
                              <i className="fas fa-utensils text-[8px] mr-1 opacity-70"></i>{food}
                          </span>
                      ))}
-                     {activity.mustBuy && activity.mustBuy.slice(0, 2).map((item, i) => (
+                     {activity.mustBuy?.slice(0, 2).map((item, i) => (
                          <span key={`buy-${i}`} className="text-[10px] px-2 py-1 bg-purple-500/10 text-purple-300 rounded-md border border-purple-500/20 truncate max-w-full">
                              <i className="fas fa-gift text-[8px] mr-1 opacity-70"></i>{item}
                          </span>

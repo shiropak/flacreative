@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Activity, ActivityType } from '../types';
 
@@ -8,6 +9,7 @@ interface ActivityDetailProps {
 
 const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) => {
   const [mounted, setMounted] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -23,8 +25,13 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
       
       {/* Hero Image Area */}
       <div className="relative h-[50vh] w-full flex-shrink-0">
-        {activity.imageUrl ? (
-            <img src={activity.imageUrl} alt={activity.title} className="w-full h-full object-cover" />
+        {activity.imageUrl && !imgError ? (
+            <img 
+                src={activity.imageUrl} 
+                alt={activity.title} 
+                className="w-full h-full object-cover" 
+                onError={() => setImgError(true)}
+            />
         ) : (
             <div className="w-full h-full bg-app-surface3 flex items-center justify-center">
                 <i className="fas fa-image text-4xl text-text-muted"></i>

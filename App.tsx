@@ -76,9 +76,8 @@ const App: React.FC = () => {
         }
     };
 
-    if (process.env.API_KEY) {
-        processEnrichment();
-    }
+    // Always run enrichment since we use the fallback key internally in service now
+    processEnrichment();
   }, []);
 
   // Safety check
