@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
   <head>
@@ -20,7 +21,7 @@
                 border: '#333333',   // Subtle Border
               },
               accent: {
-                lime: '#D4F976',     // ELECTRIC LIME (Reference Match)
+                lime: '#D4F976',     // ELECTRIC LIME
                 limeDark: '#a3e635',
                 cyan: '#22d3ee',
               },
@@ -39,13 +40,13 @@
               '5xl': '2.5rem',
             },
             boxShadow: {
-              'glow': '0 0 25px rgba(212, 249, 118, 0.2)',
+              'glow': '0 0 20px rgba(212, 249, 118, 0.15)',
               'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
             },
             animation: {
               'fadeIn': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
               'slideUp': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'shimmer': 'shimmer 2s infinite',
             },
             keyframes: {
               fadeIn: {
@@ -55,6 +56,10 @@
               slideUp: {
                 '0%': { transform: 'translateY(40px)', opacity: '0' },
                 '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              shimmer: {
+                '0%': { transform: 'translateX(-100%)' },
+                '100%': { transform: 'translateX(100%)' },
               }
             }
           }
@@ -75,12 +80,6 @@
       .no-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
-      }
-      .glass-nav {
-        background: rgba(30, 30, 30, 0.6);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
       }
       /* Invert map for dark mode aesthetic */
       .map-dark iframe {

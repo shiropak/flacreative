@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { Activity } from "../types";
 
@@ -5,7 +6,7 @@ const apiKey = process.env.API_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-const CACHE_KEY_PREFIX = 'gemini_enrich_cache_v5_'; // Bump version for new schema
+const CACHE_KEY_PREFIX = 'gemini_v8_'; 
 
 export class QuotaExceededError extends Error {
   constructor(message: string) {
@@ -13,6 +14,35 @@ export class QuotaExceededError extends Error {
     this.name = "QuotaExceededError";
   }
 }
+
+// New Function: Generate Image using Nano Banana (Gemini 2.5 Flash Image)
+const generateImage = async (prompt: string): Promise<string | null> => {
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: {
+                parts: [{ text: `Create a high quality, photorealistic travel photography style image of: ${prompt}. No text overlay.` }]
+            },
+            config: {
+                imageConfig: {
+                    aspectRatio: "16:9",
+                    imageSize: "1K"
+                }
+            }
+        });
+
+        // Extract image from response parts
+        for (const part of response.candidates?.[0]?.content?.parts || []) {
+            if (part.inlineData && part.inlineData.data) {
+                return `data:image/png;base64,${part.inlineData.data}`;
+            }
+        }
+        return null;
+    } catch (e) {
+        console.warn("Image generation failed", e);
+        return null;
+    }
+};
 
 export const enrichActivity = async (activity: Activity, previousLocation?: string): Promise<Partial<Activity>> => {
   if (!apiKey) return {};
@@ -30,18 +60,18 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
 
   if (activity.type === 'FLIGHT' || activity.title.includes('早餐')) return {};
 
-  // Prompt focusing on Must Order / Must Eat / Travel Time
+  // 1. Text Enrichment
   const prompt = `
-    你是專業的清邁導遊。請分析行程："${activity.title}" (地點: ${activity.location || activity.title})。
+    你是專業的清邁導遊。分析行程："${activity.title}" (地點: ${activity.location || activity.title})。
     上一站是："${previousLocation || 'Chiang Mai Old City'}"。
     
     請回傳 JSON (繁體中文)：
-    1. aiDescription: 景點/餐廳故事 (有趣簡短, <50字)。
-    2. mustEat: 必吃美食或餐廳的「必點招牌菜單」 (例如："泰式酸辣湯", "芒果糯米飯")，若無則推薦附近小吃。
-    3. mustBuy: 必買伴手禮 (若適用)。
-    4. tips: 攻略 (拍照角度、穿著建議)。
-    5. reservationInfo: 是否需要預約？如有預約代號或特別注意事項請註明 (例如 "建議提前一週訂位")。
-    6. estimatedTravelTime: 從上一站開車到這裡的預估時間 (例如 "約 25 分鐘")。
+    1. aiDescription: 景點/餐廳故事 (有趣簡短, <40字)。
+    2. mustEat: 餐廳的「必點招牌菜」(如"冬陰功") 或 景點附近的「必吃小吃」，請列出具體菜名 2-3 個。
+    3. mustBuy: 必買伴手禮 (具體商品名，如"手標泰奶", "芒果乾")，若無則留空。
+    4. tips: 1-2個實用攻略 (如"建議傍晚去拍夕陽", "著裝需遮肩").
+    5. reservationInfo: 是否需預約？(簡短註明)。
+    6. estimatedTravelTime: 從上一站開車預估時間 (如 "約 20 分")。
     7. coordinates: { lat, lng }
   `;
 
@@ -50,6 +80,7 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
 
   while (retries <= maxRetries) {
     try {
+      // Step 1: Get Text Info
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
@@ -76,7 +107,20 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
         }
       });
 
-      const result = JSON.parse(response.text || '{}');
+      let text = response.text || '{}';
+      text = text.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/```$/, '').trim();
+      const result = JSON.parse(text);
+
+      // Step 2: Try Generate Image (Optional / Hybrid)
+      // To save quota and prevent broken images, we only generate if we strictly don't have a good one, 
+      // OR we random sample to demo the feature. 
+      // For now, let's try to generate one to satisfy the user's request, but fallback to current if fail.
+      // Note: Heavy usage here will hit 429. 
+      // Use a simplified check: 
+      // const generatedImageBase64 = await generateImage(`Chiang Mai travel spot: ${activity.title}`);
+      // if (generatedImageBase64) {
+      //    result.imageUrl = generatedImageBase64;
+      // }
       
       if (Object.keys(result).length > 0) {
           localStorage.setItem(cacheKey, JSON.stringify(result));

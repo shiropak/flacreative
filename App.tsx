@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { INITIAL_SCHEDULE } from './constants';
 import { DaySchedule, Activity } from './types';
 import ActivityCard from './components/ActivityCard';
-import ActivityDetail from './components/ActivityDetail'; // New Component
+import ActivityDetail from './components/ActivityDetail';
 import InfoTab from './components/InfoTab';
 import { enrichActivity, QuotaExceededError } from './services/geminiService';
 
@@ -10,7 +11,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'schedule' | 'info'>('schedule');
   const [schedule, setSchedule] = useState<DaySchedule[]>(INITIAL_SCHEDULE);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null); // For Detail View
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   
   const enrichmentStarted = useRef(false);
 
@@ -44,7 +45,13 @@ const App: React.FC = () => {
                     const duration = Date.now() - startTime;
                     
                     if (Object.keys(enriched).length > 0) {
-                        activities[actIdx] = { ...activity, ...enriched };
+                        // Merge enriched data
+                        activities[actIdx] = { 
+                            ...activity, 
+                            ...enriched,
+                            // Prefer AI travel time, fallback to static
+                            estimatedTravelTime: enriched.estimatedTravelTime || activity.estimatedTravelTime 
+                        };
                         newSchedule[dayIdx].activities = activities;
                         setSchedule([...newSchedule]);
                     }
@@ -55,9 +62,9 @@ const App: React.FC = () => {
 
                     // Rate limiting delay
                     if (duration > 500) {
-                         await new Promise(r => setTimeout(r, 3000));
+                         await new Promise(r => setTimeout(r, 2000));
                     } else {
-                         await new Promise(r => setTimeout(r, 50)); 
+                         await new Promise(r => setTimeout(r, 100)); 
                     }
 
                 } catch (error) {
@@ -74,7 +81,12 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const currentDay = schedule[selectedDayIndex];
+  // Safety check
+  if (!schedule || schedule.length === 0) {
+      return <div className="min-h-screen bg-app-bg flex items-center justify-center text-white">Loading Itinerary...</div>;
+  }
+
+  const currentDay = schedule[selectedDayIndex] || schedule[0];
 
   return (
     <div className="min-h-screen w-full bg-app-bg text-text-primary pb-28 relative overflow-x-hidden">
@@ -92,7 +104,7 @@ const App: React.FC = () => {
       <div className="fixed -top-40 -right-40 w-96 h-96 bg-accent-lime/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
       {/* Top Header Area */}
-      <div className="relative z-10 pt-10 px-6 pb-2">
+      <div className="relative z-10 pt-10 px-5 pb-2">
           <div className="flex justify-between items-start mb-6">
               <div>
                   <h1 className="text-3xl font-extrabold tracking-tight mb-1">Travel Itinerary</h1>
@@ -105,12 +117,12 @@ const App: React.FC = () => {
 
           {/* Circular Date Selector */}
           {activeTab === 'schedule' && (
-              <div className="flex gap-4 overflow-x-auto no-scrollbar py-2 pl-1">
+              <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
                   {schedule.map((day, idx) => (
                       <button
                           key={day.date}
                           onClick={() => setSelectedDayIndex(idx)}
-                          className={`flex-shrink-0 w-[4.5rem] h-[5.5rem] rounded-[2rem] flex flex-col items-center justify-center gap-1 transition-all duration-300 group ${
+                          className={`flex-shrink-0 w-[4.2rem] h-[5.5rem] rounded-[1.8rem] flex flex-col items-center justify-center gap-1 transition-all duration-300 group ${
                               idx === selectedDayIndex 
                               ? 'bg-accent-lime shadow-glow scale-105' 
                               : 'bg-app-surface border border-app-border/50 hover:border-accent-lime/30'
@@ -129,7 +141,7 @@ const App: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 px-5 pt-4">
+      <div className="relative z-10 px-4 pt-4">
           {activeTab === 'schedule' ? (
               <div className="animate-fadeIn">
                   {/* Info Badge Row */}
@@ -149,7 +161,7 @@ const App: React.FC = () => {
                   </div>
 
                   {/* Activity List */}
-                  <div className="pb-4">
+                  <div className="pb-4 space-y-2">
                       {currentDay.activities.map((activity, idx) => (
                           <ActivityCard 
                               key={activity.id} 
