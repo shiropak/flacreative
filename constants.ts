@@ -20,13 +20,13 @@ export const FLIGHTS: FlightInfo[] = [
 
 export const HOTELS: HotelInfo[] = [
   {
-    name: 'Mantrini Hotel (曼特里尼酒店)',
+    name: 'The Mantrini Chiang Rai Resort',
     address: 'Chiang Mai, Thailand',
     checkIn: '11/28',
     checkOut: '11/29'
   },
   {
-    name: 'The Raintree Hotel (雨樹酒店)',
+    name: 'The Raintree Hotel',
     address: 'Chiang Mai, Thailand',
     checkIn: '11/29',
     checkOut: '12/02'
@@ -60,10 +60,10 @@ const getImg = (id: string) => `https://images.unsplash.com/photo-${id}?auto=for
 export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
     // Day 1
     '1-1': {
-        aiDescription: "集合準備出發！確認行李與護照是否帶齊，開啟美好的員工旅遊。",
-        openingHours: "03:30 集合",
+        aiDescription: "準時出發！確認行李與護照是否帶齊，開啟美好的員工旅遊。",
+        openingHours: "03:30 出發",
         estimatedTravelTime: "🚌 30 min",
-        notes: ["請準時集合", "檢查護照效期"]
+        notes: ["這是出發時間", "若要自行前往，請於04:20前抵達桃園國際機場T1 8號櫃檯"]
     },
     '1-2': {
         aiDescription: "搭乘中華航空前往泰北玫瑰—清邁。享受機上服務與空中美景。",

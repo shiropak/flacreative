@@ -113,10 +113,10 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
          <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
              <div className="flex items-center gap-2 mb-3 text-accent-lime">
                  <i className="fas fa-circle-info"></i>
-                 <span className="text-xs font-bold uppercase tracking-wider">About</span>
+                 <span className="text-xs font-bold uppercase tracking-wider">景點說明</span>
              </div>
              {hasEnrichedData ? (
-                 <p className="text-text-secondary leading-relaxed font-light text-justify">
+                 <p className="text-text-secondary leading-relaxed font-light text-justify text-sm">
                      {activity.aiDescription || "No description available yet."}
                  </p>
              ) : (
@@ -135,7 +135,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
                      <i className="fas fa-exclamation-circle"></i>
                      <span className="text-xs font-bold uppercase tracking-wider">Reservation</span>
                  </div>
-                 <p className="text-red-200 text-sm">{activity.reservationInfo}</p>
+                 <p className="text-red-200 text-sm leading-relaxed">{activity.reservationInfo}</p>
              </div>
          )}
 
@@ -149,7 +149,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
                      </div>
                      <ul className="space-y-2">
                          {activity.notes.map((note, idx) => (
-                             <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary/80">
+                             <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary/80 leading-relaxed">
                                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-500/50 flex-shrink-0"></span>
                                  <span>{note}</span>
                              </li>
@@ -221,7 +221,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
                      </div>
                      <ul className="space-y-3">
                          {activity.tips?.map((tip, idx) => (
-                             <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary">
+                             <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
                                  <i className="fas fa-check-circle text-accent-lime mt-1 opacity-70"></i>
                                  <span>{tip}</span>
                              </li>

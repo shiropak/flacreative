@@ -1,7 +1,32 @@
+
 import React from 'react';
 import { FLIGHTS, HOTELS, PACKING_LIST, EMERGENCY_CONTACTS } from '../constants';
 
 const InfoTab: React.FC = () => {
+
+  const getAirportData = (route: string) => {
+    const [fromRaw, toRaw] = route.split('➔');
+    
+    const extractCode = (str: string) => {
+        const match = str.match(/([A-Z]{3})/);
+        return match ? match[0] : '???';
+    };
+
+    const getAirportName = (code: string) => {
+        if (code === 'TPE') return '桃園國際機場';
+        if (code === 'CNX') return '清邁國際機場';
+        return '';
+    };
+
+    const fromCode = extractCode(fromRaw);
+    const toCode = extractCode(toRaw);
+
+    return {
+        from: { code: fromCode, name: getAirportName(fromCode) },
+        to: { code: toCode, name: getAirportName(toCode) }
+    };
+  };
+
   return (
     <div className="space-y-8 pb-32 animate-slideUp">
       
@@ -11,51 +36,56 @@ const InfoTab: React.FC = () => {
             Flight Details
         </h2>
         <div className="space-y-4">
-          {FLIGHTS.map((flight, idx) => (
-            <div key={idx} className="bg-app-surface rounded-[2rem] p-6 border border-white/5 relative overflow-hidden group">
-               {/* Decoration */}
-               <div className="absolute top-0 right-0 w-32 h-32 bg-accent-lime/5 rounded-bl-[4rem] transition-all group-hover:bg-accent-lime/10"></div>
-               
-               <div className="relative z-10">
-                   <div className="flex justify-between items-start mb-6">
-                        <div className="flex items-center gap-3">
-                             <div className="w-10 h-10 rounded-full bg-app-surface2 flex items-center justify-center">
-                                <i className="fas fa-plane-up text-accent-lime"></i>
-                             </div>
-                             <div>
-                                 <span className="block text-sm font-bold text-text-primary">{flight.airline}</span>
-                                 <span className="text-xs text-text-muted">{flight.flightNo}</span>
-                             </div>
-                        </div>
-                   </div>
-
-                   <div className="flex items-center justify-between gap-4 mb-6 relative">
-                        <div className="text-center">
-                            <div className="text-3xl font-black text-text-primary mb-1">TPE</div>
-                            <div className="text-[10px] text-text-secondary uppercase tracking-widest">Taipei</div>
-                        </div>
-                        
-                        <div className="flex-1 flex flex-col items-center">
-                            <div className="text-[10px] text-accent-lime mb-2 font-mono">{flight.duration}</div>
-                            <div className="w-full h-[2px] bg-app-surface2 relative rounded-full overflow-hidden">
-                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent-lime to-transparent w-1/2 animate-[shimmer_2s_infinite]"></div>
+          {FLIGHTS.map((flight, idx) => {
+            const { from, to } = getAirportData(flight.route);
+            
+            return (
+                <div key={idx} className="bg-app-surface rounded-[2rem] p-6 border border-white/5 relative overflow-hidden group">
+                   
+                   <div className="relative z-10">
+                       <div className="flex justify-between items-start mb-6">
+                            <div className="flex items-center gap-3">
+                                 <div className="w-10 h-10 rounded-full bg-app-surface2 flex items-center justify-center">
+                                    <i className="fas fa-plane-up text-accent-lime"></i>
+                                 </div>
+                                 <div>
+                                     <span className="block text-sm font-bold text-text-primary">{flight.airline}</span>
+                                     <span className="text-xs text-text-muted">{flight.flightNo}</span>
+                                 </div>
                             </div>
-                        </div>
-
-                        <div className="text-center">
-                            <div className="text-3xl font-black text-text-primary mb-1">CNX</div>
-                            <div className="text-[10px] text-text-secondary uppercase tracking-widest">Chiang Mai</div>
-                        </div>
+                       </div>
+    
+                       <div className="flex items-center justify-between gap-4 mb-6 relative">
+                            {/* Origin */}
+                            <div className="text-center w-24">
+                                <div className="text-3xl font-black text-text-primary mb-1">{from.code}</div>
+                                <div className="text-[10px] text-text-secondary uppercase tracking-widest truncate">{from.name}</div>
+                            </div>
+                            
+                            {/* Flight Path Visual */}
+                            <div className="flex-1 flex flex-col items-center">
+                                <div className="text-[10px] text-accent-lime mb-2 font-mono">{flight.duration}</div>
+                                <div className="w-full h-[2px] bg-app-surface2 relative rounded-full overflow-hidden">
+                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent-lime to-transparent w-1/2 animate-[shimmer_2s_infinite]"></div>
+                                </div>
+                            </div>
+    
+                            {/* Destination */}
+                            <div className="text-center w-24">
+                                <div className="text-3xl font-black text-text-primary mb-1">{to.code}</div>
+                                <div className="text-[10px] text-text-secondary uppercase tracking-widest truncate">{to.name}</div>
+                            </div>
+                       </div>
+    
+                       <div className="flex justify-between text-xs font-mono text-text-secondary bg-app-surface2/50 rounded-xl p-3 border border-white/5">
+                            <span>{flight.time.split('➔')[0].trim()}</span>
+                            <i className="fas fa-arrow-right text-text-muted"></i>
+                            <span>{flight.time.split('➔')[1].trim()}</span>
+                       </div>
                    </div>
-
-                   <div className="flex justify-between text-xs font-mono text-text-secondary bg-app-surface2/50 rounded-xl p-3 border border-white/5">
-                        <span>{flight.time.split('➔')[0].trim()}</span>
-                        <i className="fas fa-arrow-right text-text-muted"></i>
-                        <span>{flight.time.split('➔')[1].trim()}</span>
-                   </div>
-               </div>
-            </div>
-          ))}
+                </div>
+            );
+          })}
         </div>
       </section>
 
