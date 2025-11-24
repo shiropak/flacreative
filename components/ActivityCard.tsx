@@ -33,6 +33,18 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
     }
   };
 
+  // Helper to determine travel mode icon based on text content
+  const getTravelModeIcon = (timeString: string) => {
+      if (timeString.includes('✈') || timeString.toLowerCase().includes('flight')) return 'fa-plane';
+      if (timeString.includes('🚶') || timeString.toLowerCase().includes('walk')) return 'fa-person-walking';
+      return 'fa-car-side';
+  };
+
+  // Helper to remove emojis and symbols, keeping only text, numbers, dots and colons
+  const cleanDuration = (timeString: string) => {
+      return timeString.replace(/[^a-zA-Z0-9\s\.:]/g, '').trim();
+  };
+
   // Determine which image to show
   const displayImage = (activity.imageUrl && !imgError) 
     ? activity.imageUrl 
@@ -60,8 +72,10 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
              {activity.estimatedTravelTime && (
                 <div className="absolute top-1/2 -translate-y-1/2 bg-app-bg border border-accent-lime/30 rounded-full px-2 py-1 z-20 shadow-lg">
                     <span className="text-[9px] text-accent-lime whitespace-nowrap flex items-center gap-1 font-bold tracking-tighter">
-                         {activity.estimatedTravelTime.includes('✈') ? '' : <i className="fas fa-car-side text-[8px]"></i>}
-                         {activity.estimatedTravelTime}
+                         {/* Unified Icon Logic */}
+                         <i className={`fas ${getTravelModeIcon(activity.estimatedTravelTime)} text-[8px]`}></i>
+                         {/* Cleaned Text Logic (No Emojis) */}
+                         {cleanDuration(activity.estimatedTravelTime)}
                     </span>
                 </div>
              )}

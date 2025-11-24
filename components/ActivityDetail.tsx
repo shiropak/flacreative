@@ -41,7 +41,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
   const hasEnrichedData = !!activity.aiDescription;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-app-bg block overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-[100] bg-app-bg block overflow-y-auto animate-fadeIn h-full w-full">
       
       {/* Hero Image Area */}
       <div className="relative h-[50vh] w-full flex-shrink-0">
@@ -107,9 +107,9 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
       </div>
 
       {/* Content Body */}
-      <div className="bg-app-bg -mt-6 rounded-t-[2rem] relative z-10 px-6 pt-8 pb-40 space-y-8 min-h-[50vh] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+      <div className="bg-app-bg -mt-6 rounded-t-[2rem] relative z-10 px-6 pt-8 pb-40 space-y-4 min-h-[50vh] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
          
-         {/* Introduction (Description) */}
+         {/* Introduction (Description) - Card Style */}
          <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
              <div className="flex items-center gap-2 mb-3 text-accent-lime">
                  <i className="fas fa-circle-info"></i>
@@ -128,23 +128,25 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
              )}
          </div>
 
-         {/* Important Reservation Info */}
+         {/* Important Reservation Info - Distinct Warning Card */}
          {activity.reservationInfo && (
              <div className="bg-red-500/10 p-5 rounded-2xl border border-red-500/20">
-                 <h3 className="text-red-400 font-bold mb-2 flex items-center gap-2 text-sm uppercase tracking-wider">
-                     <i className="fas fa-exclamation-circle"></i> Reservation
-                 </h3>
+                 <div className="flex items-center gap-2 mb-2 text-red-400">
+                     <i className="fas fa-exclamation-circle"></i>
+                     <span className="text-xs font-bold uppercase tracking-wider">Reservation</span>
+                 </div>
                  <p className="text-red-200 text-sm">{activity.reservationInfo}</p>
              </div>
          )}
 
-         {/* Notes & Cautions (New Section) */}
+         {/* Notes & Cautions - Card Style */}
          {hasEnrichedData ? (
              activity.notes && activity.notes.length > 0 && (
-                 <div className="bg-yellow-500/5 p-5 rounded-2xl border border-yellow-500/10">
-                     <h3 className="text-yellow-500 font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
-                         <i className="fas fa-triangle-exclamation"></i> 注意事項 (Notes)
-                     </h3>
+                 <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+                     <div className="flex items-center gap-2 mb-3 text-yellow-500">
+                         <i className="fas fa-triangle-exclamation"></i>
+                         <span className="text-xs font-bold uppercase tracking-wider">注意事項 (Notes)</span>
+                     </div>
                      <ul className="space-y-2">
                          {activity.notes.map((note, idx) => (
                              <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary/80">
@@ -155,93 +157,83 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
                      </ul>
                  </div>
              )
-         ) : (
-             <LoadingSkeleton className="h-24 w-full rounded-2xl" />
+         ) : null}
+
+         {/* Must Eat - Card Style */}
+         {(activity.type === ActivityType.FOOD || activity.type === ActivityType.SIGHTSEEING) && (
+             <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+                 <div className="flex items-center gap-2 mb-3 text-orange-400">
+                     <i className="fas fa-utensils"></i>
+                     <span className="text-xs font-bold uppercase tracking-wider">必吃美食 & 菜單</span>
+                 </div>
+                 {hasEnrichedData ? (
+                     activity.mustEat && activity.mustEat.length > 0 ? (
+                         <div className="flex flex-wrap gap-3">
+                             {activity.mustEat?.map((item, idx) => (
+                                 <span key={idx} className="px-4 py-2 bg-orange-500/10 text-orange-300 rounded-xl border border-orange-500/20 text-sm font-medium">
+                                     {item}
+                                 </span>
+                             ))}
+                         </div>
+                     ) : <p className="text-sm text-text-muted italic">暫無推薦資訊</p>
+                 ) : (
+                     <div className="flex gap-2">
+                         <LoadingSkeleton className="h-8 w-24 rounded-xl" />
+                         <LoadingSkeleton className="h-8 w-32 rounded-xl" />
+                     </div>
+                 )}
+             </div>
          )}
 
-         {/* Highlights Grid */}
-         <div className="grid grid-cols-1 gap-6">
-             {/* Must Eat */}
-             {(activity.type === ActivityType.FOOD || activity.type === ActivityType.SIGHTSEEING) && (
-                 <div>
-                     <h3 className="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
-                         <span className="w-1 h-6 bg-orange-500 rounded-full"></span>
-                         必吃美食 & 菜單
-                     </h3>
-                     {hasEnrichedData ? (
-                         activity.mustEat && activity.mustEat.length > 0 ? (
-                             <div className="flex flex-wrap gap-3">
-                                 {activity.mustEat?.map((item, idx) => (
-                                     <span key={idx} className="px-4 py-2 bg-orange-500/10 text-orange-300 rounded-xl border border-orange-500/20 text-sm font-medium">
-                                         {item}
-                                     </span>
-                                 ))}
-                             </div>
-                         ) : <p className="text-sm text-text-muted italic">暫無推薦資訊</p>
-                     ) : (
-                         <div className="flex gap-2">
-                             <LoadingSkeleton className="h-8 w-24 rounded-xl" />
-                             <LoadingSkeleton className="h-8 w-32 rounded-xl" />
-                         </div>
-                     )}
+         {/* Must Buy - Card Style */}
+         {(activity.type === ActivityType.SHOPPING || activity.type === ActivityType.SIGHTSEEING) && (
+             <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+                 <div className="flex items-center gap-2 mb-3 text-purple-400">
+                     <i className="fas fa-gift"></i>
+                     <span className="text-xs font-bold uppercase tracking-wider">必買伴手禮</span>
                  </div>
-             )}
-
-             {/* Must Buy */}
-             {(activity.type === ActivityType.SHOPPING || activity.type === ActivityType.SIGHTSEEING) && (
-                 <div>
-                     <h3 className="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
-                         <span className="w-1 h-6 bg-purple-500 rounded-full"></span>
-                         必買伴手禮
-                     </h3>
-                     {hasEnrichedData ? (
-                         activity.mustBuy && activity.mustBuy.length > 0 ? (
-                             <div className="flex flex-wrap gap-3">
-                                 {activity.mustBuy?.map((item, idx) => (
-                                     <span key={idx} className="px-4 py-2 bg-purple-500/10 text-purple-300 rounded-xl border border-purple-500/20 text-sm font-medium">
-                                         {item}
-                                     </span>
-                                 ))}
-                             </div>
-                         ) : <p className="text-sm text-text-muted italic">暫無推薦資訊</p>
-                     ) : (
-                         <div className="flex gap-2">
-                             <LoadingSkeleton className="h-8 w-20 rounded-xl" />
-                             <LoadingSkeleton className="h-8 w-28 rounded-xl" />
-                         </div>
-                     )}
-                 </div>
-             )}
-             
-             {/* Tips */}
-             {hasEnrichedData ? (
-                 activity.tips && activity.tips.length > 0 && (
-                     <div>
-                         <h3 className="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
-                             <span className="w-1 h-6 bg-accent-lime rounded-full"></span>
-                             旅遊攻略
-                         </h3>
-                         <ul className="space-y-3">
-                             {activity.tips?.map((tip, idx) => (
-                                 <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary">
-                                     <i className="fas fa-check-circle text-accent-lime mt-1"></i>
-                                     <span>{tip}</span>
-                                 </li>
+                 {hasEnrichedData ? (
+                     activity.mustBuy && activity.mustBuy.length > 0 ? (
+                         <div className="flex flex-wrap gap-3">
+                             {activity.mustBuy?.map((item, idx) => (
+                                 <span key={idx} className="px-4 py-2 bg-purple-500/10 text-purple-300 rounded-xl border border-purple-500/20 text-sm font-medium">
+                                     {item}
+                                 </span>
                              ))}
-                         </ul>
+                         </div>
+                     ) : <p className="text-sm text-text-muted italic">暫無推薦資訊</p>
+                 ) : (
+                     <div className="flex gap-2">
+                         <LoadingSkeleton className="h-8 w-20 rounded-xl" />
+                         <LoadingSkeleton className="h-8 w-28 rounded-xl" />
                      </div>
-                 )
-             ) : (
-                 <div className="space-y-2">
-                     <LoadingSkeleton className="h-4 w-full" />
-                     <LoadingSkeleton className="h-4 w-5/6" />
+                 )}
+             </div>
+         )}
+         
+         {/* Tips - Card Style */}
+         {hasEnrichedData ? (
+             activity.tips && activity.tips.length > 0 && (
+                 <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+                     <div className="flex items-center gap-2 mb-3 text-accent-lime">
+                         <i className="fas fa-lightbulb"></i>
+                         <span className="text-xs font-bold uppercase tracking-wider">旅遊攻略</span>
+                     </div>
+                     <ul className="space-y-3">
+                         {activity.tips?.map((tip, idx) => (
+                             <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary">
+                                 <i className="fas fa-check-circle text-accent-lime mt-1 opacity-70"></i>
+                                 <span>{tip}</span>
+                             </li>
+                         ))}
+                     </ul>
                  </div>
-             )}
-         </div>
+             )
+         ) : null}
 
-         {/* Map */}
+         {/* Map - Card Style */}
          {activity.location && (
-             <div className="rounded-3xl overflow-hidden h-48 w-full map-dark relative border border-white/10 mt-4">
+             <div className="rounded-2xl overflow-hidden h-48 w-full map-dark relative border border-white/10 mt-4">
                 <iframe
                     width="100%"
                     height="100%"

@@ -39,7 +39,8 @@ const App: React.FC = () => {
         for (let dayIdx = 0; dayIdx < newSchedule.length; dayIdx++) {
             let previousLoc = "The Raintree Hotel Chiang Mai";
             if (dayIdx === 0) previousLoc = "Chiang Mai International Airport";
-            
+            if (dayIdx === 0 && newSchedule[dayIdx].activities[0].title.includes('桃園')) previousLoc = "Taipei City";
+
             const day = newSchedule[dayIdx];
             const activities = [...day.activities];
             
@@ -50,6 +51,11 @@ const App: React.FC = () => {
                 if (activity.aiDescription) {
                     if (activity.location) previousLoc = activity.location;
                     continue;
+                }
+                
+                // Context adjustment for flight arrival
+                if (activity.title.includes('抵達') || activity.type === 'FLIGHT') {
+                     if (activity.location) previousLoc = activity.location;
                 }
 
                 try {
@@ -134,16 +140,16 @@ const App: React.FC = () => {
               </div>
           </div>
 
-          {/* Circular Date Selector */}
+          {/* Circular Date Selector - Updated Padding/Margin to fix clipping */}
           {activeTab === 'schedule' && (
-              <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
+              <div className="flex gap-3 overflow-x-auto no-scrollbar p-6 -mx-6 px-6">
                   {schedule.map((day, idx) => (
                       <button
                           key={day.date}
                           onClick={() => setSelectedDayIndex(idx)}
                           className={`flex-shrink-0 w-[4.2rem] h-[5.5rem] rounded-[1.8rem] flex flex-col items-center justify-center gap-1 transition-all duration-300 group ${
                               idx === selectedDayIndex 
-                              ? 'bg-accent-lime shadow-glow scale-105' 
+                              ? 'bg-accent-lime shadow-glow scale-105 z-10' 
                               : 'bg-app-surface border border-app-border/50 hover:border-accent-lime/30'
                           }`}
                       >
