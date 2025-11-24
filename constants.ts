@@ -66,7 +66,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     activities: [
       { 
         id: '1-1', time: '07:20', title: '出發：桃園國際機場', type: ActivityType.FLIGHT, location: 'Taoyuan International Airport', originalDescription: '中華航空 CI 851',
-        imageUrl: getImg('1569154941061-e00328c27717'), estimatedTravelTime: '✈️ 4hr 5m'
+        imageUrl: getImg('1436491865332-7a61a109cc05'), estimatedTravelTime: '✈️ 4hr 5m'
       },
       { 
         id: '1-2', time: '10:25', title: '抵達：清邁國際機場', type: ActivityType.FLIGHT, location: 'Chiang Mai International Airport',
@@ -75,7 +75,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
       { id: '1-3', time: '早午餐', title: '機上餐點 / 機場', type: ActivityType.FOOD, imageUrl: getImg('1542338547-93fa31ea8e6c'), estimatedTravelTime: '🚗 30 min' },
       { 
         id: '1-4', time: '下午', title: '清萊白廟 (Wat Rong Khun)', type: ActivityType.SIGHTSEEING, location: 'Wat Rong Khun', originalDescription: '龍坤藝術廟',
-        imageUrl: getImg('1598935898639-3237d2e0ae4d'), estimatedTravelTime: '🚗 15 min'
+        imageUrl: getImg('1528181304800-259b08848526'), estimatedTravelTime: '🚗 15 min'
       },
       { id: '1-5', time: '午餐', title: '泰式自助餐', type: ActivityType.FOOD, imageUrl: getImg('1559314809-0d155014e29e'), estimatedTravelTime: '🚗 40 min' },
       { 
@@ -102,7 +102,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
       { id: '2-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 15 min' },
       { 
         id: '2-2', time: '早上', title: '清萊藍廟 (Wat Rong Suea Ten)', type: ActivityType.SIGHTSEEING, location: 'Wat Rong Suea Ten (Blue Temple)',
-        imageUrl: getImg('1626092624062-a4787a997452'), estimatedTravelTime: '🚗 10 min'
+        imageUrl: getImg('1528181304800-259b08848526'), estimatedTravelTime: '🚗 10 min'
       },
       { 
         id: '2-3', time: '午餐', title: '火山排骨龍蝦麵 + 蝶豆花創意飲品', type: ActivityType.FOOD, location: 'Chiang Mai',

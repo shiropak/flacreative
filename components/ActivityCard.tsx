@@ -8,6 +8,16 @@ interface ActivityCardProps {
   onClick: () => void;
 }
 
+const FALLBACK_IMAGES: Record<string, string> = {
+  [ActivityType.FOOD]: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=800&q=80', // Thai Food
+  [ActivityType.SIGHTSEEING]: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=80', // Thai Temple
+  [ActivityType.SHOPPING]: 'https://images.unsplash.com/photo-1533025404451-826cb4c32b41?auto=format&fit=crop&w=800&q=80', // Market
+  [ActivityType.FLIGHT]: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80', // Plane
+  [ActivityType.HOTEL]: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80', // Hotel
+  [ActivityType.ACTIVITY]: 'https://images.unsplash.com/photo-1599707367072-cd6c66aa22f1?auto=format&fit=crop&w=800&q=80', // Thai Dress
+  'DEFAULT': 'https://images.unsplash.com/photo-1506665531195-3566aa2b4d43?auto=format&fit=crop&w=800&q=80' // Nature
+};
+
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }) => {
   const [imgError, setImgError] = useState(false);
 
@@ -22,6 +32,11 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
       default: return 'fa-location-dot';
     }
   };
+
+  // Determine which image to show
+  const displayImage = (activity.imageUrl && !imgError) 
+    ? activity.imageUrl 
+    : (FALLBACK_IMAGES[activity.type] || FALLBACK_IMAGES.DEFAULT);
 
   return (
     <div className="relative flex group cursor-pointer w-full" onClick={onClick}>
@@ -58,22 +73,15 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
       <div className="flex-1 pb-8 min-w-0">
          <div className="bg-app-surface rounded-[1.5rem] border border-white/5 shadow-lg hover:border-accent-lime/50 transition-all duration-300 overflow-hidden group-active:scale-[0.99] w-full flex flex-col">
              
-             {/* Image Header (Full Width) */}
+             {/* Image Header (Full Width) - ALWAYS SHOWS IMAGE */}
              <div className="w-full h-48 bg-app-surface2 relative overflow-hidden">
-                 {activity.imageUrl && !imgError ? (
-                     <img 
-                        src={activity.imageUrl} 
-                        alt={activity.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                        loading="lazy" 
-                        onError={() => setImgError(true)}
-                     />
-                 ) : (
-                     <div className="w-full h-full flex flex-col items-center justify-center text-gray-600 bg-app-surface3">
-                        <i className={`fas ${getIcon(activity.type)} text-3xl mb-2 opacity-50`}></i>
-                        <span className="text-xs text-text-muted">Image Unavailable</span>
-                     </div>
-                 )}
+                 <img 
+                    src={displayImage}
+                    alt={activity.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                    loading="lazy" 
+                    onError={() => setImgError(true)}
+                 />
                  
                  {/* Type Badge Overlay */}
                  <div className="absolute top-3 left-3">

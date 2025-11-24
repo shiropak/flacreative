@@ -7,6 +7,16 @@ interface ActivityDetailProps {
   onClose: () => void;
 }
 
+const FALLBACK_IMAGES: Record<string, string> = {
+  [ActivityType.FOOD]: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=800&q=80',
+  [ActivityType.SIGHTSEEING]: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=80',
+  [ActivityType.SHOPPING]: 'https://images.unsplash.com/photo-1533025404451-826cb4c32b41?auto=format&fit=crop&w=800&q=80',
+  [ActivityType.FLIGHT]: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80',
+  [ActivityType.HOTEL]: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+  [ActivityType.ACTIVITY]: 'https://images.unsplash.com/photo-1599707367072-cd6c66aa22f1?auto=format&fit=crop&w=800&q=80',
+  'DEFAULT': 'https://images.unsplash.com/photo-1506665531195-3566aa2b4d43?auto=format&fit=crop&w=800&q=80'
+};
+
 const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) => {
   const [mounted, setMounted] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -20,23 +30,21 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, onClose }) =>
     };
   }, []);
 
+  const displayImage = (activity.imageUrl && !imgError) 
+    ? activity.imageUrl 
+    : (FALLBACK_IMAGES[activity.type] || FALLBACK_IMAGES.DEFAULT);
+
   return (
     <div className={`fixed inset-0 z-50 bg-app-bg flex flex-col overflow-y-auto transition-opacity duration-300 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
       
       {/* Hero Image Area */}
       <div className="relative h-[50vh] w-full flex-shrink-0">
-        {activity.imageUrl && !imgError ? (
-            <img 
-                src={activity.imageUrl} 
-                alt={activity.title} 
-                className="w-full h-full object-cover" 
-                onError={() => setImgError(true)}
-            />
-        ) : (
-            <div className="w-full h-full bg-app-surface3 flex items-center justify-center">
-                <i className="fas fa-image text-4xl text-text-muted"></i>
-            </div>
-        )}
+        <img 
+            src={displayImage} 
+            alt={activity.title} 
+            className="w-full h-full object-cover" 
+            onError={() => setImgError(true)}
+        />
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-app-bg"></div>
         
