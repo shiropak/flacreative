@@ -11,7 +11,8 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'schedule' | 'info'>('schedule');
   const [schedule, setSchedule] = useState<DaySchedule[]>(INITIAL_SCHEDULE);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  // CHANGE: Track ID instead of object to allow live updates from background AI processes
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   
   const enrichmentStarted = useRef(false);
 
@@ -25,13 +26,12 @@ const App: React.FC = () => {
         
         // 1. Predict Weather for each day
         for (let i = 0; i < newSchedule.length; i++) {
-             // Always fetch prediction if it's the placeholder, or to ensure sync
              if (newSchedule[i].weatherRange === 'Loading...' || newSchedule[i].weatherIcon === '⏳') {
                  const prediction = await predictWeather(newSchedule[i].date);
                  newSchedule[i].weatherRange = prediction.range;
                  newSchedule[i].weatherIcon = prediction.icon;
-                 setSchedule([...newSchedule]); // Update UI immediately after each day resolves
-                 await new Promise(r => setTimeout(r, 300)); // Small delay for effect
+                 setSchedule([...newSchedule]); 
+                 await new Promise(r => setTimeout(r, 300)); 
              }
         }
 
@@ -62,18 +62,16 @@ const App: React.FC = () => {
                         activities[actIdx] = { 
                             ...activity, 
                             ...enriched,
-                            // Prefer AI travel time, fallback to static
                             estimatedTravelTime: enriched.estimatedTravelTime || activity.estimatedTravelTime 
                         };
                         newSchedule[dayIdx].activities = activities;
-                        setSchedule([...newSchedule]);
+                        setSchedule([...newSchedule]); // This triggers re-render, effectively updating the active Detail view
                     }
                     
                     if (activities[actIdx].location) {
                         previousLoc = activities[actIdx].location!;
                     }
 
-                    // Rate limiting delay
                     if (duration > 500) {
                          await new Promise(r => setTimeout(r, 2000));
                     } else {
@@ -92,12 +90,16 @@ const App: React.FC = () => {
     processEnrichment();
   }, []);
 
-  // Safety check
   if (!schedule || schedule.length === 0) {
       return <div className="min-h-screen bg-app-bg flex items-center justify-center text-white">Loading Itinerary...</div>;
   }
 
   const currentDay = schedule[selectedDayIndex] || schedule[0];
+  
+  // Derive the active activity object from the schedule based on the selected ID
+  const selectedActivity = selectedActivityId 
+    ? schedule.flatMap(d => d.activities).find(a => a.id === selectedActivityId) 
+    : null;
 
   return (
     <div className="min-h-screen w-full bg-app-bg text-text-primary pb-28 relative overflow-x-hidden">
@@ -110,7 +112,7 @@ const App: React.FC = () => {
                 temp: currentDay.weatherRange,
                 icon: currentDay.weatherIcon || '⛅'
               }}
-              onClose={() => setSelectedActivity(null)} 
+              onClose={() => setSelectedActivityId(null)} 
           />
       )}
 
@@ -184,7 +186,7 @@ const App: React.FC = () => {
                               key={activity.id} 
                               activity={activity} 
                               isLast={idx === currentDay.activities.length - 1} 
-                              onClick={() => setSelectedActivity(activity)}
+                              onClick={() => setSelectedActivityId(activity.id)}
                           />
                       ))}
                   </div>

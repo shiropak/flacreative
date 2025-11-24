@@ -19,11 +19,9 @@ const FALLBACK_IMAGES: Record<string, string> = {
 };
 
 const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onClose }) => {
-  const [mounted, setMounted] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     // Disable body scroll when modal is open
     document.body.style.overflow = 'hidden';
     return () => {
@@ -35,8 +33,15 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
     ? activity.imageUrl 
     : (FALLBACK_IMAGES[activity.type] || FALLBACK_IMAGES.DEFAULT);
 
+  // Helper for Skeleton Loading
+  const LoadingSkeleton = ({ className }: { className?: string }) => (
+    <div className={`bg-white/5 animate-pulse rounded-lg ${className}`}></div>
+  );
+
+  const hasEnrichedData = !!activity.aiDescription;
+
   return (
-    <div className={`fixed inset-0 z-50 bg-app-bg flex flex-col overflow-y-auto transition-opacity duration-300 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+    <div className="fixed inset-0 z-[100] bg-app-bg flex flex-col overflow-y-auto animate-fadeIn">
       
       {/* Hero Image Area */}
       <div className="relative h-[50vh] w-full flex-shrink-0">
@@ -53,7 +58,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
         <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-start z-20">
             <button 
                 onClick={onClose}
-                className="w-10 h-10 rounded-full bg-black/40 backdrop-blur text-white flex items-center justify-center border border-white/10 active:scale-90 transition-transform"
+                className="w-10 h-10 rounded-full bg-black/40 backdrop-blur text-white flex items-center justify-center border border-white/10 active:scale-90 transition-transform hover:bg-black/60"
             >
                 <i className="fas fa-arrow-left"></i>
             </button>
@@ -86,32 +91,42 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
                     <i className="fas fa-map-marker-alt text-accent-lime"></i>
                     {activity.location || 'Chiang Mai'}
                 </div>
-                {/* Opening Hours Badge */}
-                {activity.openingHours && (
-                    <div className="flex items-center gap-2 text-text-secondary text-xs">
-                        <i className="far fa-clock text-accent-lime"></i>
-                        <span>{activity.openingHours}</span>
-                    </div>
+                {/* Opening Hours Badge or Loading */}
+                {hasEnrichedData ? (
+                    activity.openingHours && (
+                        <div className="flex items-center gap-2 text-text-secondary text-xs">
+                            <i className="far fa-clock text-accent-lime"></i>
+                            <span>{activity.openingHours}</span>
+                        </div>
+                    )
+                ) : (
+                    <LoadingSkeleton className="h-4 w-32 mt-1" />
                 )}
             </div>
         </div>
       </div>
 
       {/* Content Body */}
-      <div className="flex-1 bg-app-bg -mt-6 rounded-t-[2rem] relative z-10 px-6 pt-8 pb-20 space-y-8 min-h-[50vh]">
+      <div className="flex-1 bg-app-bg -mt-6 rounded-t-[2rem] relative z-10 px-6 pt-8 pb-32 space-y-8 min-h-[50vh] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
          
          {/* Introduction (Description) */}
-         {activity.aiDescription && (
-             <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
-                 <div className="flex items-center gap-2 mb-3 text-accent-lime">
-                     <i className="fas fa-circle-info"></i>
-                     <span className="text-xs font-bold uppercase tracking-wider">About</span>
-                 </div>
-                 <p className="text-text-secondary leading-relaxed font-light text-justify">
-                     {activity.aiDescription}
-                 </p>
+         <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+             <div className="flex items-center gap-2 mb-3 text-accent-lime">
+                 <i className="fas fa-circle-info"></i>
+                 <span className="text-xs font-bold uppercase tracking-wider">About</span>
              </div>
-         )}
+             {hasEnrichedData ? (
+                 <p className="text-text-secondary leading-relaxed font-light text-justify">
+                     {activity.aiDescription || "No description available yet."}
+                 </p>
+             ) : (
+                 <div className="space-y-2">
+                     <LoadingSkeleton className="h-4 w-full" />
+                     <LoadingSkeleton className="h-4 w-5/6" />
+                     <LoadingSkeleton className="h-4 w-4/6" />
+                 </div>
+             )}
+         </div>
 
          {/* Important Reservation Info */}
          {activity.reservationInfo && (
@@ -124,73 +139,102 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
          )}
 
          {/* Notes & Cautions (New Section) */}
-         {activity.notes && activity.notes.length > 0 && (
-             <div className="bg-yellow-500/5 p-5 rounded-2xl border border-yellow-500/10">
-                 <h3 className="text-yellow-500 font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
-                     <i className="fas fa-triangle-exclamation"></i> 注意事項 (Notes)
-                 </h3>
-                 <ul className="space-y-2">
-                     {activity.notes.map((note, idx) => (
-                         <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary/80">
-                             <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-500/50 flex-shrink-0"></span>
-                             <span>{note}</span>
-                         </li>
-                     ))}
-                 </ul>
-             </div>
+         {hasEnrichedData ? (
+             activity.notes && activity.notes.length > 0 && (
+                 <div className="bg-yellow-500/5 p-5 rounded-2xl border border-yellow-500/10">
+                     <h3 className="text-yellow-500 font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                         <i className="fas fa-triangle-exclamation"></i> 注意事項 (Notes)
+                     </h3>
+                     <ul className="space-y-2">
+                         {activity.notes.map((note, idx) => (
+                             <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary/80">
+                                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-500/50 flex-shrink-0"></span>
+                                 <span>{note}</span>
+                             </li>
+                         ))}
+                     </ul>
+                 </div>
+             )
+         ) : (
+             <LoadingSkeleton className="h-24 w-full rounded-2xl" />
          )}
 
          {/* Highlights Grid */}
          <div className="grid grid-cols-1 gap-6">
              {/* Must Eat */}
-             {activity.mustEat && activity.mustEat.length > 0 && (
+             {(activity.type === ActivityType.FOOD || activity.type === ActivityType.SIGHTSEEING) && (
                  <div>
                      <h3 className="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
                          <span className="w-1 h-6 bg-orange-500 rounded-full"></span>
                          必吃美食 & 菜單
                      </h3>
-                     <div className="flex flex-wrap gap-3">
-                         {activity.mustEat?.map((item, idx) => (
-                             <span key={idx} className="px-4 py-2 bg-orange-500/10 text-orange-300 rounded-xl border border-orange-500/20 text-sm font-medium">
-                                 {item}
-                             </span>
-                         ))}
-                     </div>
+                     {hasEnrichedData ? (
+                         activity.mustEat && activity.mustEat.length > 0 ? (
+                             <div className="flex flex-wrap gap-3">
+                                 {activity.mustEat?.map((item, idx) => (
+                                     <span key={idx} className="px-4 py-2 bg-orange-500/10 text-orange-300 rounded-xl border border-orange-500/20 text-sm font-medium">
+                                         {item}
+                                     </span>
+                                 ))}
+                             </div>
+                         ) : <p className="text-sm text-text-muted italic">暫無推薦資訊</p>
+                     ) : (
+                         <div className="flex gap-2">
+                             <LoadingSkeleton className="h-8 w-24 rounded-xl" />
+                             <LoadingSkeleton className="h-8 w-32 rounded-xl" />
+                         </div>
+                     )}
                  </div>
              )}
 
              {/* Must Buy */}
-             {activity.mustBuy && activity.mustBuy.length > 0 && (
+             {(activity.type === ActivityType.SHOPPING || activity.type === ActivityType.SIGHTSEEING) && (
                  <div>
                      <h3 className="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
                          <span className="w-1 h-6 bg-purple-500 rounded-full"></span>
                          必買伴手禮
                      </h3>
-                     <div className="flex flex-wrap gap-3">
-                         {activity.mustBuy?.map((item, idx) => (
-                             <span key={idx} className="px-4 py-2 bg-purple-500/10 text-purple-300 rounded-xl border border-purple-500/20 text-sm font-medium">
-                                 {item}
-                             </span>
-                         ))}
-                     </div>
+                     {hasEnrichedData ? (
+                         activity.mustBuy && activity.mustBuy.length > 0 ? (
+                             <div className="flex flex-wrap gap-3">
+                                 {activity.mustBuy?.map((item, idx) => (
+                                     <span key={idx} className="px-4 py-2 bg-purple-500/10 text-purple-300 rounded-xl border border-purple-500/20 text-sm font-medium">
+                                         {item}
+                                     </span>
+                                 ))}
+                             </div>
+                         ) : <p className="text-sm text-text-muted italic">暫無推薦資訊</p>
+                     ) : (
+                         <div className="flex gap-2">
+                             <LoadingSkeleton className="h-8 w-20 rounded-xl" />
+                             <LoadingSkeleton className="h-8 w-28 rounded-xl" />
+                         </div>
+                     )}
                  </div>
              )}
              
              {/* Tips */}
-             {activity.tips && activity.tips.length > 0 && (
-                 <div>
-                     <h3 className="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
-                         <span className="w-1 h-6 bg-accent-lime rounded-full"></span>
-                         旅遊攻略
-                     </h3>
-                     <ul className="space-y-3">
-                         {activity.tips?.map((tip, idx) => (
-                             <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary">
-                                 <i className="fas fa-check-circle text-accent-lime mt-1"></i>
-                                 <span>{tip}</span>
-                             </li>
-                         ))}
-                     </ul>
+             {hasEnrichedData ? (
+                 activity.tips && activity.tips.length > 0 && (
+                     <div>
+                         <h3 className="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
+                             <span className="w-1 h-6 bg-accent-lime rounded-full"></span>
+                             旅遊攻略
+                         </h3>
+                         <ul className="space-y-3">
+                             {activity.tips?.map((tip, idx) => (
+                                 <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary">
+                                     <i className="fas fa-check-circle text-accent-lime mt-1"></i>
+                                     <span>{tip}</span>
+                                 </li>
+                             ))}
+                         </ul>
+                     </div>
+                 )
+             ) : (
+                 <div className="space-y-2">
+                     <LoadingSkeleton className="h-4 w-full" />
+                     <LoadingSkeleton className="h-4 w-5/6" />
                  </div>
              )}
          </div>
@@ -212,10 +256,10 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
       </div>
 
       {/* Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 w-full bg-app-bg/90 backdrop-blur p-6 border-t border-white/5 z-30">
+      <div className="fixed bottom-0 left-0 w-full bg-app-bg/95 backdrop-blur-xl p-6 border-t border-white/5 z-50">
           <button 
              onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location || '')}`, '_blank')}
-             className="w-full bg-accent-lime text-app-bg font-bold py-4 rounded-2xl shadow-glow text-lg flex items-center justify-center gap-2 hover:brightness-110 transition-all"
+             className="w-full bg-accent-lime text-app-bg font-bold py-4 rounded-2xl shadow-glow text-lg flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-[0.98]"
           >
               <i className="fas fa-location-arrow"></i> Start Navigation
           </button>
