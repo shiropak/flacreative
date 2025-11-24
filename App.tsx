@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { INITIAL_SCHEDULE } from './constants';
-import { DaySchedule } from './types';
+import { DaySchedule, Activity } from './types';
 import ActivityCard from './components/ActivityCard';
+import ActivityDetail from './components/ActivityDetail'; // New Component
 import InfoTab from './components/InfoTab';
 import { enrichActivity, QuotaExceededError } from './services/geminiService';
 
@@ -9,9 +10,11 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'schedule' | 'info'>('schedule');
   const [schedule, setSchedule] = useState<DaySchedule[]>(INITIAL_SCHEDULE);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null); // For Detail View
+  
   const enrichmentStarted = useRef(false);
 
-  // AI Enrichment Logic (Preserved from previous safe version)
+  // AI Enrichment Logic
   useEffect(() => {
     const processEnrichment = async () => {
         if (enrichmentStarted.current) return;
@@ -29,6 +32,7 @@ const App: React.FC = () => {
             for (let actIdx = 0; actIdx < activities.length; actIdx++) {
                 const activity = activities[actIdx];
                 
+                // Skip if already enriched
                 if (activity.aiDescription) {
                     if (activity.location) previousLoc = activity.location;
                     continue;
@@ -49,18 +53,17 @@ const App: React.FC = () => {
                         previousLoc = activities[actIdx].location!;
                     }
 
+                    // Rate limiting delay
                     if (duration > 500) {
-                         await new Promise(r => setTimeout(r, 4000));
+                         await new Promise(r => setTimeout(r, 3000));
                     } else {
                          await new Promise(r => setTimeout(r, 50)); 
                     }
 
                 } catch (error) {
                     if (error instanceof QuotaExceededError) {
-                        console.warn("🛑 Daily Quota Exceeded.");
                         return;
                     }
-                    console.error("Enrichment error", error);
                 }
             }
         }
@@ -74,34 +77,51 @@ const App: React.FC = () => {
   const currentDay = schedule[selectedDayIndex];
 
   return (
-    <div className="min-h-screen w-full bg-app-bg text-text-primary pb-24 relative">
+    <div className="min-h-screen w-full bg-app-bg text-text-primary pb-28 relative overflow-x-hidden">
       
+      {/* Detail View Overlay */}
+      {selectedActivity && (
+          <ActivityDetail 
+              activity={selectedActivity} 
+              onClose={() => setSelectedActivity(null)} 
+          />
+      )}
+
+      {/* Background Ambience */}
+      <div className="fixed top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-app-surface2/30 to-app-bg pointer-events-none z-0"></div>
+      <div className="fixed -top-40 -right-40 w-96 h-96 bg-accent-lime/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
+
       {/* Top Header Area */}
-      <div className="pt-14 px-6 pb-4 sticky top-0 bg-app-bg/95 backdrop-blur z-30 border-b border-app-border/30">
-          <div className="flex justify-between items-center mb-6">
+      <div className="relative z-10 pt-10 px-6 pb-2">
+          <div className="flex justify-between items-start mb-6">
               <div>
-                  <p className="text-accent-lime text-xs font-bold uppercase tracking-widest mb-1">FLA Creative</p>
-                  <h1 className="text-3xl font-bold">Chiang Mai</h1>
+                  <h1 className="text-3xl font-extrabold tracking-tight mb-1">Travel Itinerary</h1>
+                  <p className="text-text-secondary text-sm font-medium">Nov 28 - Dec 02 • Chiang Mai</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-app-surface2 border border-app-border flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-app-surface border border-app-border flex items-center justify-center shadow-lg">
                   <i className="fas fa-user text-text-secondary text-sm"></i>
               </div>
           </div>
 
-          {/* Search/Tabs Bar Style Date Selector */}
+          {/* Circular Date Selector */}
           {activeTab === 'schedule' && (
-              <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar py-2 pl-1">
                   {schedule.map((day, idx) => (
                       <button
                           key={day.date}
                           onClick={() => setSelectedDayIndex(idx)}
-                          className={`flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                          className={`flex-shrink-0 w-[4.5rem] h-[5.5rem] rounded-[2rem] flex flex-col items-center justify-center gap-1 transition-all duration-300 group ${
                               idx === selectedDayIndex 
-                              ? 'bg-accent-lime text-app-bg font-bold' 
-                              : 'bg-app-surface text-text-secondary border border-app-border'
+                              ? 'bg-accent-lime shadow-glow scale-105' 
+                              : 'bg-app-surface border border-app-border/50 hover:border-accent-lime/30'
                           }`}
                       >
-                          {day.dayLabel}
+                          <span className={`text-2xl font-bold ${idx === selectedDayIndex ? 'text-text-inverse' : 'text-text-primary group-hover:text-accent-lime'}`}>
+                             {idx + 1}
+                          </span>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${idx === selectedDayIndex ? 'text-text-inverse/70' : 'text-text-secondary'}`}>
+                             Day
+                          </span>
                       </button>
                   ))}
               </div>
@@ -109,43 +129,33 @@ const App: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="px-6 pt-6">
+      <div className="relative z-10 px-5 pt-4">
           {activeTab === 'schedule' ? (
               <div className="animate-fadeIn">
-                  {/* Day Highlights Card */}
-                  <div className="mb-8 bg-gradient-to-br from-app-surface2 to-app-bg border border-app-border rounded-[2rem] p-6 relative overflow-hidden">
-                       <div className="absolute top-0 right-0 w-32 h-32 bg-accent-lime/10 blur-3xl rounded-full"></div>
-                       
-                       <div className="relative z-10 flex justify-between items-end">
-                            <div>
-                                <div className="text-5xl font-light mb-1 text-white">{currentDay.fullDate}</div>
-                                <div className="text-text-secondary text-sm font-medium">{currentDay.date.split('-')[0]}</div>
-                            </div>
-                            <div className="flex gap-2">
-                                <div className="px-3 py-2 bg-app-surface rounded-xl border border-app-border flex flex-col items-center min-w-[60px]">
-                                    <i className="fas fa-temperature-half text-orange-400 text-xs mb-1"></i>
-                                    <span className="text-xs font-bold">{currentDay.weatherRange}</span>
-                                </div>
-                                <div className="px-3 py-2 bg-app-surface rounded-xl border border-app-border flex flex-col items-center min-w-[60px]">
-                                    <i className="fas fa-tshirt text-accent-cyan text-xs mb-1"></i>
-                                    <span className="text-xs font-bold truncate w-full text-center">{currentDay.dressCode.split(' ')[0]}</span>
-                                </div>
-                            </div>
+                  {/* Info Badge Row */}
+                  <div className="flex items-center gap-3 mb-6 overflow-x-auto no-scrollbar">
+                       <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
+                            <i className="fas fa-calendar text-accent-lime text-xs"></i>
+                            <span className="text-xs font-medium text-text-primary">{currentDay.fullDate}</span>
+                       </div>
+                       <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
+                            <i className="fas fa-cloud-sun text-accent-lime text-xs"></i>
+                            <span className="text-xs font-medium text-text-primary">{currentDay.weatherRange}</span>
+                       </div>
+                       <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
+                            <i className="fas fa-tshirt text-accent-lime text-xs"></i>
+                            <span className="text-xs font-medium text-text-primary">{currentDay.dressCode.split(' ')[0]}</span>
                        </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-4">
-                      <span className="text-text-muted text-xs font-bold uppercase tracking-wider">Timeline</span>
-                      <div className="h-px bg-app-border flex-1"></div>
-                  </div>
-
                   {/* Activity List */}
-                  <div className="pb-10">
+                  <div className="pb-4">
                       {currentDay.activities.map((activity, idx) => (
                           <ActivityCard 
                               key={activity.id} 
                               activity={activity} 
                               isLast={idx === currentDay.activities.length - 1} 
+                              onClick={() => setSelectedActivity(activity)}
                           />
                       ))}
                   </div>
@@ -155,22 +165,31 @@ const App: React.FC = () => {
           )}
       </div>
 
-      {/* Bottom Floating Nav */}
-      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 w-auto z-50">
-          <div className="glass-nav rounded-full p-1.5 flex items-center shadow-glass">
+      {/* Floating Bottom Navigation */}
+      <div className="fixed bottom-8 left-0 w-full flex justify-center z-40 pointer-events-none">
+          <div className="pointer-events-auto bg-[#1E1E1E]/80 border border-white/10 p-1.5 rounded-full shadow-2xl flex items-center gap-1 backdrop-blur-xl">
               <button 
                   onClick={() => setActiveTab('schedule')}
-                  className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all ${activeTab === 'schedule' ? 'bg-text-primary text-app-bg' : 'text-text-secondary hover:text-white'}`}
+                  className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all duration-300 ${
+                    activeTab === 'schedule' 
+                    ? 'bg-accent-lime text-text-inverse shadow-glow' 
+                    : 'text-text-secondary hover:text-white hover:bg-white/5'
+                  }`}
               >
-                  <i className="fas fa-map"></i>
-                  {activeTab === 'schedule' && <span className="text-sm font-bold">Plan</span>}
+                  <i className="fas fa-map-location-dot text-sm"></i>
+                  <span className="text-sm font-bold">Itinerary</span>
               </button>
+              
               <button 
                   onClick={() => setActiveTab('info')}
-                  className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all ${activeTab === 'info' ? 'bg-text-primary text-app-bg' : 'text-text-secondary hover:text-white'}`}
+                  className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all duration-300 ${
+                    activeTab === 'info' 
+                    ? 'bg-accent-lime text-text-inverse shadow-glow' 
+                    : 'text-text-secondary hover:text-white hover:bg-white/5'
+                  }`}
               >
-                  <i className="fas fa-info-circle"></i>
-                  {activeTab === 'info' && <span className="text-sm font-bold">Info</span>}
+                  <i className="fas fa-suitcase text-sm"></i>
+                  <span className="text-sm font-bold">Guide</span>
               </button>
           </div>
       </div>

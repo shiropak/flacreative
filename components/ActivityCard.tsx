@@ -1,155 +1,94 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Activity, ActivityType } from '../types';
 
 interface ActivityCardProps {
   activity: Activity;
   isLast: boolean;
+  onClick: () => void;
 }
 
-const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast }) => {
-  const [expanded, setExpanded] = useState(false);
-
+const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }) => {
   const getIcon = (type: ActivityType) => {
     switch (type) {
-      case ActivityType.FLIGHT: return 'fa-plane';
+      case ActivityType.FLIGHT: return 'fa-plane-departure';
       case ActivityType.FOOD: return 'fa-utensils';
       case ActivityType.SIGHTSEEING: return 'fa-camera';
       case ActivityType.SHOPPING: return 'fa-bag-shopping';
       case ActivityType.HOTEL: return 'fa-bed';
-      case ActivityType.ACTIVITY: return 'fa-ticket';
+      case ActivityType.ACTIVITY: return 'fa-ticket-simple';
       default: return 'fa-location-dot';
     }
   };
 
-  // In dark mode, we use subtle backgrounds for icons
-  const getIconStyle = (type: ActivityType) => {
-    switch (type) {
-      case ActivityType.FLIGHT: return 'text-blue-400 bg-blue-400/10';
-      case ActivityType.FOOD: return 'text-orange-400 bg-orange-400/10';
-      case ActivityType.SIGHTSEEING: return 'text-accent-lime bg-accent-lime/10';
-      case ActivityType.HOTEL: return 'text-purple-400 bg-purple-400/10';
-      case ActivityType.SHOPPING: return 'text-pink-400 bg-pink-400/10';
-      default: return 'text-gray-400 bg-gray-400/10';
-    }
-  };
-
-  const hasDetails = activity.aiDescription || activity.mustEat?.length || activity.tips?.length || activity.location;
-
   return (
-    <div className="mb-4 animate-slideUp">
-      <div 
-        className={`
-            bg-app-surface border border-app-border/50 rounded-[1.5rem] overflow-hidden transition-all duration-300
-            ${expanded ? 'ring-1 ring-accent-lime/50 shadow-glow' : 'active:scale-[0.99] hover:bg-app-surface2'}
-        `}
-        onClick={() => hasDetails && setExpanded(!expanded)}
-      >
-        <div className="p-5 flex items-center gap-4">
-            {/* Icon Box */}
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${getIconStyle(activity.type)}`}>
-               <i className={`fas ${getIcon(activity.type)} text-lg`}></i>
-            </div>
-
-            {/* Main Info */}
-            <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-bold text-text-primary text-base truncate pr-2">{activity.title}</h3>
-                    <span className="font-mono text-xs font-bold text-accent-lime bg-accent-lime/10 px-2 py-1 rounded-lg whitespace-nowrap">
-                        {activity.time}
+    <div className="relative flex group cursor-pointer" onClick={onClick}>
+      {/* Left Timeline Column */}
+      <div className="flex flex-col items-center mr-4 min-w-[4rem]">
+        {/* Time */}
+        <span className="text-accent-lime font-mono font-bold text-sm mb-2">{activity.time}</span>
+        
+        {/* Icon Dot */}
+        <div className="w-10 h-10 rounded-full bg-app-surface2 flex items-center justify-center text-text-secondary shadow-md z-10 group-hover:bg-accent-lime group-hover:text-app-bg transition-colors duration-300">
+           <i className={`fas ${getIcon(activity.type)}`}></i>
+        </div>
+        
+        {/* Vertical Connector Line with Travel Time */}
+        {!isLast && (
+          <div className="flex-1 w-[2px] bg-white/10 my-1 relative flex items-center justify-center min-h-[40px]">
+             {/* Travel Time Pill */}
+             {activity.estimatedTravelTime && (
+                <div className="absolute bg-app-bg border border-white/10 rounded-full px-2 py-0.5 z-20">
+                    <span className="text-[10px] text-text-muted whitespace-nowrap flex items-center gap-1">
+                         <i className="fas fa-car text-accent-lime"></i>
+                         {activity.estimatedTravelTime}
                     </span>
                 </div>
-                <p className="text-sm text-text-secondary truncate">
-                    {activity.location || activity.originalDescription || 'Activity Details'}
-                </p>
-            </div>
-            
-             {/* Chevron */}
-             {hasDetails && (
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-app-surface2 transition-transform duration-300 ${expanded ? '-rotate-180' : ''}`}>
-                     <i className="fas fa-chevron-down text-xs text-text-muted"></i>
-                </div>
-            )}
-        </div>
-
-        {/* Expanded Details */}
-        {expanded && (
-          <div className="px-5 pb-6 animate-fadeIn">
-            <div className="h-px w-full bg-app-border/50 mb-5"></div>
-            
-            {/* Travel Time Info */}
-            {activity.estimatedTravelTime && (
-                <div className="flex items-center gap-2 mb-4 text-xs text-text-secondary">
-                    <i className="fas fa-car-side"></i>
-                    <span>Drive: {activity.estimatedTravelTime}</span>
-                </div>
-            )}
-
-            {/* AI Description */}
-            {activity.aiDescription && (
-                <p className="text-sm text-text-primary leading-relaxed mb-5 font-light border-l-2 border-accent-lime pl-3">
-                    {activity.aiDescription}
-                </p>
-            )}
-
-            {/* Map Embed - Dark Mode Style */}
-            {activity.location && (
-                <div className="mb-5 relative rounded-2xl overflow-hidden h-40 w-full map-dark bg-app-surface2">
-                    <iframe
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        style={{ border: 0 }}
-                        src={`https://maps.google.com/maps?q=${encodeURIComponent(activity.location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
-                        allowFullScreen
-                    ></iframe>
-                     <button 
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location || '')}`, '_blank');
-                        }}
-                        className="absolute bottom-3 right-3 bg-app-surface/90 backdrop-blur border border-app-border text-[10px] font-bold text-text-primary px-3 py-1.5 rounded-full flex items-center gap-1.5 hover:bg-app-surface2 transition-colors"
-                    >
-                        <i className="fas fa-map-marker-alt text-accent-lime"></i> Open Map
-                    </button>
-                </div>
-            )}
-
-            {/* Tag Groups */}
-            <div className="space-y-4">
-                {/* Must Eat */}
-                {activity.mustEat && activity.mustEat.length > 0 && (
-                    <div>
-                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Must Eat</p>
-                        <div className="flex flex-wrap gap-2">
-                            {activity.mustEat.map((item, idx) => (
-                                <span key={idx} className="px-3 py-1.5 bg-orange-500/10 text-orange-300 border border-orange-500/20 text-xs rounded-lg font-medium">
-                                    {item}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Tips */}
-                 {activity.tips && activity.tips.length > 0 && (
-                    <div>
-                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Pro Tips</p>
-                        <div className="bg-app-surface2 rounded-xl p-3 border border-app-border/50">
-                             <ul className="space-y-2">
-                                {activity.tips.map((item, idx) => (
-                                    <li key={idx} className="flex items-start gap-2.5">
-                                        <i className="fas fa-check-circle text-accent-lime text-xs mt-0.5"></i>
-                                        <span className="text-xs text-text-secondary leading-relaxed">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                )}
-            </div>
-
+             )}
           </div>
         )}
+      </div>
+
+      {/* Card Content */}
+      <div className="flex-1 pb-6">
+         <div className="bg-app-surface rounded-3xl p-2 pr-4 border border-white/5 shadow-lg hover:border-accent-lime/30 transition-all duration-300 flex items-center gap-4 overflow-hidden h-24">
+             {/* Image Thumbnail */}
+             <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-800">
+                 {activity.imageUrl ? (
+                     <img src={activity.imageUrl} alt={activity.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                 ) : (
+                     <div className="w-full h-full flex items-center justify-center text-gray-600"><i className="fas fa-image"></i></div>
+                 )}
+             </div>
+
+             {/* Text Info */}
+             <div className="flex-1 min-w-0">
+                 <h3 className="text-base font-bold text-text-primary truncate group-hover:text-accent-lime transition-colors">
+                     {activity.title}
+                 </h3>
+                 <p className="text-xs text-text-secondary truncate mt-1">
+                     {activity.location || activity.originalDescription}
+                 </p>
+                 
+                 {/* Quick Badges */}
+                 <div className="flex gap-2 mt-2">
+                     {activity.reservationInfo && (
+                         <span className="text-[9px] px-2 py-0.5 bg-red-500/20 text-red-400 rounded-full font-bold border border-red-500/20">
+                             預約
+                         </span>
+                     )}
+                     {activity.mustEat && activity.mustEat.length > 0 && (
+                         <span className="text-[9px] px-2 py-0.5 bg-orange-500/20 text-orange-400 rounded-full border border-orange-500/20">
+                             必吃
+                         </span>
+                     )}
+                 </div>
+             </div>
+
+             {/* Chevron */}
+             <div className="text-white/20 group-hover:translate-x-1 transition-transform">
+                 <i className="fas fa-chevron-right"></i>
+             </div>
+         </div>
       </div>
     </div>
   );

@@ -15,11 +15,14 @@ export interface Activity {
   type: ActivityType;
   location?: string;
   originalDescription?: string;
+  imageUrl?: string; // New field for cover images
+  
   // Enhanced fields from AI
   aiDescription?: string;
-  mustEat?: string[];
-  mustBuy?: string[];
-  tips?: string[];
+  mustEat?: string[]; // 必吃美食 / 必點菜單
+  mustBuy?: string[]; // 必買伴手禮
+  tips?: string[];    // 攻略 / 拍照點
+  reservationInfo?: string; // 重要預約代號
   coordinates?: { lat: number; lng: number };
   estimatedTravelTime?: string; // Time from previous activity
 }

@@ -5,7 +5,7 @@ const apiKey = process.env.API_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-const CACHE_KEY_PREFIX = 'gemini_enrich_cache_v3_'; // Increment version to clear old bad data if any
+const CACHE_KEY_PREFIX = 'gemini_enrich_cache_v5_'; // Bump version for new schema
 
 export class QuotaExceededError extends Error {
   constructor(message: string) {
@@ -17,8 +17,7 @@ export class QuotaExceededError extends Error {
 export const enrichActivity = async (activity: Activity, previousLocation?: string): Promise<Partial<Activity>> => {
   if (!apiKey) return {};
 
-  // 1. Check LocalStorage Cache
-  // This prevents hitting the API for data we already have, saving massive amounts of quota.
+  // Check Cache
   const cacheKey = `${CACHE_KEY_PREFIX}${activity.id}`;
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
@@ -29,27 +28,25 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
     }
   }
 
-  // Skip simple generic activities to save quota
-  if (activity.type === 'FLIGHT' || activity.title.includes('早餐') || activity.title.includes('機上')) return {};
+  if (activity.type === 'FLIGHT' || activity.title.includes('早餐')) return {};
 
+  // Prompt focusing on Must Order / Must Eat / Travel Time
   const prompt = `
-    你是一位專業的清邁在地導遊。請分析這個旅遊行程：
-    活動名稱："${activity.title}"
-    地點："${activity.location || activity.title}"
-    原描述："${activity.originalDescription || ''}"
-    上一站地點："${previousLocation || 'Chiang Mai Old City'}"。
+    你是專業的清邁導遊。請分析行程："${activity.title}" (地點: ${activity.location || activity.title})。
+    上一站是："${previousLocation || 'Chiang Mai Old City'}"。
     
-    請提供以下繁體中文資訊 (JSON格式)：
-    1. aiDescription: 簡短有趣的一句話介紹，像是導遊在介紹景點故事 (繁體中文, < 30字)。
-    2. mustEat: 如果是餐廳或市集，列出2個必吃美食；如果是景點，列出附近知名小吃 (繁體中文)。
-    3. mustBuy: 如果是市集或商場，列出2個必買清單；否則留空 (繁體中文)。
-    4. tips: 2個旅遊小撇步 (例如：最佳拍照點、穿著建議、預約代號提醒) (繁體中文)。
-    5. estimatedTravelTime: 從上一站開車到這裡的預估時間 (例如 "約 20 分鐘")。
-    6. coordinates: 該地點的經緯度 { lat, lng }。
+    請回傳 JSON (繁體中文)：
+    1. aiDescription: 景點/餐廳故事 (有趣簡短, <50字)。
+    2. mustEat: 必吃美食或餐廳的「必點招牌菜單」 (例如："泰式酸辣湯", "芒果糯米飯")，若無則推薦附近小吃。
+    3. mustBuy: 必買伴手禮 (若適用)。
+    4. tips: 攻略 (拍照角度、穿著建議)。
+    5. reservationInfo: 是否需要預約？如有預約代號或特別注意事項請註明 (例如 "建議提前一週訂位")。
+    6. estimatedTravelTime: 從上一站開車到這裡的預估時間 (例如 "約 25 分鐘")。
+    7. coordinates: { lat, lng }
   `;
 
   let retries = 0;
-  const maxRetries = 2; // Reduced retries to fail faster if quota is dead
+  const maxRetries = 1; 
 
   while (retries <= maxRetries) {
     try {
@@ -65,6 +62,7 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
               mustEat: { type: Type.ARRAY, items: { type: Type.STRING } },
               mustBuy: { type: Type.ARRAY, items: { type: Type.STRING } },
               tips: { type: Type.ARRAY, items: { type: Type.STRING } },
+              reservationInfo: { type: Type.STRING },
               estimatedTravelTime: { type: Type.STRING },
               coordinates: {
                 type: Type.OBJECT,
@@ -80,7 +78,6 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
 
       const result = JSON.parse(response.text || '{}');
       
-      // 2. Save to Cache on Success
       if (Object.keys(result).length > 0) {
           localStorage.setItem(cacheKey, JSON.stringify(result));
       }
@@ -92,16 +89,14 @@ export const enrichActivity = async (activity: Activity, previousLocation?: stri
       if (isRateLimit) {
         if (retries < maxRetries) {
             const waitTime = 2000 * Math.pow(2, retries); 
-            console.warn(`Quota limit hit for "${activity.title}". Retrying in ${waitTime/1000}s...`);
             await delay(waitTime);
             retries++;
         } else {
-            // Critical: Throw a specific error so the App loop can stop completely
             throw new QuotaExceededError("Gemini API Quota Exceeded");
         }
       } else {
         console.error(`Gemini enrichment failed for ${activity.title}`, error);
-        return {}; // Non-critical error, just return empty to keep app working
+        return {}; 
       }
     }
   }

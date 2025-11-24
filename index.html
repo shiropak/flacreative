@@ -6,27 +6,29 @@
     <title>FLA Creative 清邁之旅 2025</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
               app: {
-                bg: '#0f0f11',       // Deepest Charcoal
-                surface: '#18181b',  // Card Background
-                surface2: '#27272a', // Lighter Card
-                border: '#3f3f46',   // Border
+                bg: '#050505',       // Almost Black
+                surface: '#121212',  // Deep Surface
+                surface2: '#1E1E1E', // Lighter Surface
+                surface3: '#2C2C2C', // Lightest Surface
+                border: '#333333',   // Subtle Border
               },
               accent: {
-                lime: '#bef264',     // Modern Lime (Book Now button style)
+                lime: '#D4F976',     // ELECTRIC LIME (Reference Match)
                 limeDark: '#a3e635',
                 cyan: '#22d3ee',
               },
               text: {
                 primary: '#ffffff',
-                secondary: '#a1a1aa',
-                muted: '#71717a',
+                secondary: '#9CA3AF', // Cool Gray
+                muted: '#6B7280',
+                inverse: '#000000',
               }
             },
             fontFamily: {
@@ -37,12 +39,13 @@
               '5xl': '2.5rem',
             },
             boxShadow: {
-              'glow': '0 0 20px rgba(190, 242, 100, 0.15)',
-              'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+              'glow': '0 0 25px rgba(212, 249, 118, 0.2)',
+              'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
             },
             animation: {
-              'fadeIn': 'fadeIn 0.5s ease-out forwards',
-              'slideUp': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'fadeIn': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'slideUp': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               fadeIn: {
@@ -50,7 +53,7 @@
                 '100%': { opacity: '1' },
               },
               slideUp: {
-                '0%': { transform: 'translateY(20px)', opacity: '0' },
+                '0%': { transform: 'translateY(40px)', opacity: '0' },
                 '100%': { transform: 'translateY(0)', opacity: '1' },
               }
             }
@@ -60,7 +63,7 @@
     </script>
     <style>
       body {
-        background-color: #0f0f11;
+        background-color: #050505;
         font-family: 'Inter', 'Noto Sans TC', sans-serif;
         -webkit-tap-highlight-color: transparent;
         overscroll-behavior-y: none;
@@ -74,14 +77,14 @@
           scrollbar-width: none;
       }
       .glass-nav {
-        background: rgba(39, 39, 42, 0.8);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(30, 30, 30, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
       /* Invert map for dark mode aesthetic */
       .map-dark iframe {
-        filter: invert(100%) hue-rotate(180deg) brightness(0.8) contrast(0.9);
+        filter: invert(100%) hue-rotate(180deg) brightness(0.7) contrast(1.2) saturate(0.8);
         border-radius: 1rem;
       }
     </style>
