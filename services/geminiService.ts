@@ -1,7 +1,7 @@
-
 import { Activity } from "../types";
 import { ACTIVITY_DETAILS } from "../constants";
 
+// Error class kept for compatibility, though not strictly needed for static mode
 export class QuotaExceededError extends Error {
   constructor(message: string) {
     super(message);
@@ -19,7 +19,7 @@ const ACCUWEATHER_DATA: Record<string, { range: string, icon: string }> = {
 };
 
 const FALLBACK_ENRICHMENT = {
-    aiDescription: "暫無詳細資訊 (Description unavailable)",
+    aiDescription: "暫無詳細資訊",
     openingHours: "依現場公告為準",
     notes: [],
     mustEat: [],
@@ -29,7 +29,7 @@ const FALLBACK_ENRICHMENT = {
     estimatedTravelTime: ""
 };
 
-// Function to predict weather for a specific date (MOCKED STATIC)
+// Function to predict weather for a specific date (STATIC MOCK - No API Key needed)
 export const predictWeather = async (date: string): Promise<{ range: string, icon: string }> => {
     // Return precise manual data immediately
     if (ACCUWEATHER_DATA[date]) {
@@ -38,13 +38,13 @@ export const predictWeather = async (date: string): Promise<{ range: string, ico
     return { range: '20-28°C', icon: '☀️' };
 };
 
-// Function to enrich activity (MOCKED STATIC - BYPASSING API)
+// Function to enrich activity (STATIC MOCK - No API Key needed)
 export const enrichActivity = async (activity: Activity, previousLocation?: string): Promise<Partial<Activity>> => {
   // Look up pre-generated details from constants.ts
   const details = ACTIVITY_DETAILS[activity.id];
   
   if (details) {
-      // Simulate a tiny network delay for realism (optional, but makes UI transitions smoother)
+      // Simulate a tiny network delay for realism (optional)
       // await new Promise(resolve => setTimeout(resolve, 50)); 
       return details;
   }

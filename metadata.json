@@ -1,7 +1,5 @@
 {
   "name": "FLA Creative 清邁之旅 2025",
   "description": "FLA Creative 2025 員工旅遊 - 專屬旅遊小秘書",
-  "requestFramePermissions": [
-    "geolocation"
-  ]
+  "requestFramePermissions": []
 }

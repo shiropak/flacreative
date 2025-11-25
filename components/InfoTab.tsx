@@ -5,12 +5,12 @@ import { FLIGHTS, HOTELS, PACKING_LIST, EMERGENCY_CONTACTS } from '../constants'
 const InfoTab: React.FC = () => {
 
   const getAirportData = (route: string) => {
-    const [fromRaw, toRaw] = route.split('➔');
+    // Use Regex to find all 3-letter airport codes (e.g., TPE, CNX)
+    // This is safer than splitting by special characters like ➔
+    const matches = route.match(/([A-Z]{3})/g);
     
-    const extractCode = (str: string) => {
-        const match = str.match(/([A-Z]{3})/);
-        return match ? match[0] : '???';
-    };
+    const fromCode = matches && matches[0] ? matches[0] : '???';
+    const toCode = matches && matches[1] ? matches[1] : '???';
 
     const getAirportName = (code: string) => {
         if (code === 'TPE') return '桃園國際機場';
@@ -18,13 +18,19 @@ const InfoTab: React.FC = () => {
         return '';
     };
 
-    const fromCode = extractCode(fromRaw);
-    const toCode = extractCode(toRaw);
-
     return {
         from: { code: fromCode, name: getAirportName(fromCode) },
         to: { code: toCode, name: getAirportName(toCode) }
     };
+  };
+
+  const getFlightTimes = (timeStr: string) => {
+      // Split by arrow or potential variations
+      const parts = timeStr.split(/➔|->|to/);
+      if (parts.length === 2) {
+          return { start: parts[0].trim(), end: parts[1].trim() };
+      }
+      return { start: timeStr, end: '' };
   };
 
   return (
@@ -38,6 +44,7 @@ const InfoTab: React.FC = () => {
         <div className="space-y-4">
           {FLIGHTS.map((flight, idx) => {
             const { from, to } = getAirportData(flight.route);
+            const { start, end } = getFlightTimes(flight.time);
             
             return (
                 <div key={idx} className="bg-app-surface rounded-[2rem] p-6 border border-white/5 relative overflow-hidden group">
@@ -78,9 +85,9 @@ const InfoTab: React.FC = () => {
                        </div>
     
                        <div className="flex justify-between text-xs font-mono text-text-secondary bg-app-surface2/50 rounded-xl p-3 border border-white/5">
-                            <span>{flight.time.split('➔')[0].trim()}</span>
+                            <span>{start}</span>
                             <i className="fas fa-arrow-right text-text-muted"></i>
-                            <span>{flight.time.split('➔')[1].trim()}</span>
+                            <span>{end}</span>
                        </div>
                    </div>
                 </div>
