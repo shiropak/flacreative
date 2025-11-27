@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Activity, ActivityType } from '../types';
 
@@ -45,11 +46,33 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
   };
 
   // Determine which image to show
-  // LOGIC CHANGE: Only show image if URL exists. If URL exists but errors, show fallback.
-  // If URL is undefined/empty, show NO image (text card).
   const displayImage = activity.imageUrl 
     ? (imgError ? (FALLBACK_IMAGES[activity.type] || FALLBACK_IMAGES.DEFAULT) : activity.imageUrl)
     : null;
+
+  // Aggregate keywords: combine all highlight fields regardless of activity type
+  const getKeywords = () => {
+      const rawKeywords: string[] = [];
+
+      // Merge all specific arrays
+      if (activity.mustEat) rawKeywords.push(...activity.mustEat);
+      if (activity.mustBuy) rawKeywords.push(...activity.mustBuy);
+      if (activity.tips) rawKeywords.push(...activity.tips);
+
+      // Clean: Remove text in parentheses and extra whitespace
+      // e.g., "Coconut Ice Cream (Entrance)" -> "Coconut Ice Cream"
+      const cleaned = rawKeywords.map(tag => {
+          return tag.split(/[（(]/)[0].trim();
+      });
+
+      // Deduplicate
+      const uniqueKeywords = Array.from(new Set(cleaned));
+
+      // Return max 6 items
+      return uniqueKeywords.slice(0, 6);
+  };
+
+  const displayKeywords = getKeywords();
 
   return (
     <div className="relative flex group cursor-pointer w-full" onClick={onClick}>
@@ -120,26 +143,16 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
                     )}
                  </div>
 
-                 {/* AI Tags Display Area - Safely Mapped */}
-                 {(activity.mustEat?.length || activity.mustBuy?.length || activity.tips?.length) ? (
+                 {/* Consolidated Keywords Display Area */}
+                 {displayKeywords.length > 0 && (
                      <div className="flex flex-wrap gap-2 mt-1">
-                         {activity.mustEat?.slice(0, 3).map((food, i) => (
-                             <span key={`food-${i}`} className="text-[10px] px-2 py-1 bg-orange-500/10 text-orange-300 rounded-md border border-orange-500/20 truncate max-w-full">
-                                 <i className="fas fa-utensils text-[8px] mr-1 opacity-70"></i>{food}
+                         {displayKeywords.map((tag, i) => (
+                             <span key={`tag-${i}`} className="text-[10px] px-2 py-1 bg-white/5 text-text-secondary rounded-md border border-white/10 truncate max-w-[15ch]">
+                                 #{tag}
                              </span>
                          ))}
-                         {activity.mustBuy?.slice(0, 2).map((item, i) => (
-                             <span key={`buy-${i}`} className="text-[10px] px-2 py-1 bg-purple-500/10 text-purple-300 rounded-md border border-purple-500/20 truncate max-w-full">
-                                 <i className="fas fa-gift text-[8px] mr-1 opacity-70"></i>{item}
-                             </span>
-                         ))}
-                         {activity.tips && activity.tips.length > 0 && (
-                              <span className="text-[10px] px-2 py-1 bg-blue-500/10 text-blue-300 rounded-md border border-blue-500/20 truncate max-w-full">
-                                 <i className="fas fa-lightbulb text-[8px] mr-1 opacity-70"></i>攻略
-                             </span>
-                         )}
                      </div>
-                 ) : null}
+                 )}
 
                  {/* View Details Link */}
                  <div className="flex justify-between items-center pt-2 border-t border-white/5 mt-1">

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Activity, ActivityType } from '../types';
 
@@ -189,8 +190,8 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
              )
          ) : null}
 
-         {/* Must Eat - Card Style */}
-         {(activity.type === ActivityType.FOOD || activity.type === ActivityType.SIGHTSEEING) && (
+         {/* Must Eat - Card Style (Restricted to Food only) */}
+         {(activity.type === ActivityType.FOOD) && (
              <div className="bg-app-surface p-6 rounded-2xl border border-white/5">
                  <div className="flex items-center gap-2 mb-3 text-orange-400">
                      <i className="fas fa-utensils"></i>
@@ -220,7 +221,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
              <div className="bg-app-surface p-6 rounded-2xl border border-white/5">
                  <div className="flex items-center gap-2 mb-3 text-purple-400">
                      <i className="fas fa-gift"></i>
-                     <span className="text-xs font-bold uppercase tracking-wider">必買伴手禮</span>
+                     <span className="text-xs font-bold uppercase tracking-wider">伴手禮參考</span>
                  </div>
                  {hasEnrichedData ? (
                      activity.mustBuy && activity.mustBuy.length > 0 ? (

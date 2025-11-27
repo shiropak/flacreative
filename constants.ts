@@ -1,3 +1,4 @@
+
 import { DaySchedule, ActivityType, FlightInfo, HotelInfo, Activity } from './types';
 
 export const FLIGHTS: FlightInfo[] = [
@@ -46,7 +47,8 @@ export const PACKING_LIST = [
 ];
 
 export const EMERGENCY_CONTACTS = [
-  { name: "導遊 (A-Long)", number: "+66 81 234 5678" },
+  { name: "LINE 群組", number: "點擊加入", link: "https://line.me/R/ti/g/DHxcyt6A-5" },
+  { name: "領隊 (趙自強)", number: "0973-125-902" },
   { name: "觀光警察", number: "1155" },
   { name: "清邁蘭醫院 (Chiang Mai Ram)", number: "053 920 300" },
   { name: "駐泰國台北經濟文化辦事處", number: "+66 2 119 3555" }
@@ -79,7 +81,10 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
         openingHours: "07:00 - 18:00",
         estimatedTravelTime: "🚌 1.5 hr", // Airport -> Mae Kachan (~1.5hr)
         mustEat: ["溫泉鵪鶉蛋", "溫泉雞蛋"],
-        notes: ["小心地滑", "溫泉水溫高請注意安全"]
+        notes: [
+            "廁所進去需要投 5 泰銖現金",
+            "溫泉池邊和周圍地板會較為濕滑，行走時務必小心"
+        ]
     },
     '1-6': { // Lunch
         estimatedTravelTime: "🚗 10 min", // Nearby
@@ -139,8 +144,17 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
         tips: ["很多可愛的打卡點", "價格比市區夜市親民"],
         notes: ["大部分攤販只收現金"]
     },
-    '2-5': { // Dinner
-         estimatedTravelTime: "🚗 20 min",
+    '2-5': { // Kung Yim Shop
+        aiDescription: "在地人推薦的高CP值海鮮燒烤吃到飽！餐廳提供新鮮的泰國蝦、螃蟹、貝類等豐富海鮮，採自助式夾取。最特別的是這裡的活蝦現撈現烤，保證新鮮。",
+        openingHours: "16:00 - 23:00",
+        estimatedTravelTime: "🚗 20 min",
+        mustEat: ["泰國蝦 (River Prawn)", "梭子蟹", "海螺", "特製海鮮沾醬"],
+        tips: [
+            "海鮮吃到飽三小時 850泰銖/人", 
+            "建議先烤蝦子，比較慢熟",
+            "海鮮選項包含泰國蝦、梭子蟹、魷魚、海螺等"
+        ],
+        notes: ["僅收現金", "炭火燒烤小心高溫"]
     },
     '2-6': { // Warorot
         aiDescription: "位於古城附近，是清邁最大的市集也是清邁的唐人街，建築風格與曼谷的唐人街類似。瓦洛洛市場分為三層樓，伴手禮、美食、便宜的衣服在這裡都應有盡有。",
@@ -174,7 +188,12 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
         mustEat: ["有機咖啡", "泰式煎餅", "手作麵包"],
         mustBuy: ["設計師棉麻衣物", "手工陶器", "天然護膚品"],
         tips: ["如果逛街累了可抓時間去按摩"],
-        notes: ["由於觀光客日益增加，近期還有中國直播帶貨，所以價格會相對比較貴。"]
+        notes: [
+            "由於觀光客日益增加，近期還有中國直播帶貨，所以價格會相對比較貴。",
+            "多數小吃攤和手作攤位以現金交易",
+            "鼓勵環保，建議自備購物袋",
+            "注意保管個人財物"
+        ]
     },
     '3-3': { // Michelin Thai
         aiDescription: "2020年起，在泰國清邁餐廳連續五年榮獲米其林必比登推介，以手工製作的菜餚與用心服務一直是許多當地人與遊客必訪的餐廳，能感受到地道泰式家庭氛圍，又能品嚐傳統與創新結合的美食，那麼 Saiyut & Doctor Sai Kitchen 絕對是一個不可錯過的餐廳選擇，這家由母女檔創立的私廚餐廳，以「美食即是生活中的藝術」為理念，不僅有豐富的泰式菜餚，還兼具藝術的擺盤與溫馨的用餐環境。",
@@ -189,7 +208,11 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
         openingHours: "09:00 - 18:00",
         estimatedTravelTime: "🚗 10 min",
         tips: ["建議將頭髮盤起", "金色飾品拍照效果好"],
-        notes: ["小心配飾勾到衣物"]
+        notes: [
+            "女生也可以選擇穿男款泰服",
+            "建議自備 Nubra 或平口抹胸，也可以準備安全褲",
+            "泰服有一邊是無袖設計，不建議穿 T 恤打底，店家可能會請你脫掉喔！"
+        ]
     },
     '3-5': { // Three Kings
         aiDescription: "蘭納古城之旅，參觀三王紀念碑與大塔寺 (Wat Chedi Luang)。大塔寺是清邁古城內最高的建築，雖因地震受損，但仍展現出宏偉的蘭納建築風格。",
@@ -285,7 +308,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
       },
       { 
         id: '1-5', time: '', title: '清萊溫泉休息站', type: ActivityType.SIGHTSEEING, location: 'Mae Kachan Hot Spring',
-        imageUrl: getImg('1569336685283-13b2287ebbb9'), estimatedTravelTime: '🚌 1.5 hr'
+        imageUrl: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0f/35/c7/44/mae-khachan-hot-spring.jpg?w=900&h=500&s=1', estimatedTravelTime: '🚌 1.5 hr'
       },
       { id: '1-6', time: '午餐', title: '泰式自助餐', type: ActivityType.FOOD, estimatedTravelTime: '🚗 10 min' },
       {
@@ -325,7 +348,10 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
         id: '2-4', time: '下午', title: '椰林市集', type: ActivityType.SIGHTSEEING, location: 'Coconut Market Chiang Mai', originalDescription: '週末市集',
         imageUrl: getImg('1533025404451-826cb4c32b41'), estimatedTravelTime: '🚗 20 min'
       },
-      { id: '2-5', time: '晚餐', title: 'Kung Yim Shop (2 Branch)', type: ActivityType.FOOD, location: 'Kung Yim Shop', estimatedTravelTime: '🚗 20 min' },
+      { 
+        id: '2-5', time: '晚餐', title: 'Kung Yim Shop (2 Branch)', type: ActivityType.FOOD, location: 'กุ้งยิ้ม-เชียงใหม่ สาขาช้างม่อย',
+        estimatedTravelTime: '🚗 20 min'
+      },
       { 
         id: '2-6', time: '晚上', title: '瓦洛洛市場', type: ActivityType.SHOPPING, location: 'Waroros Market (Kad Luang)', originalDescription: '必逛在地市集',
         imageUrl: 'https://i0.wp.com/journey.tw/wp-content/uploads/2025/07/20250728023617_0_9dcdc1.jpg?resize=1100%2C732&quality=99&ssl=1', estimatedTravelTime: '🚗 15 min'
@@ -352,7 +378,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
       },
       { 
         id: '3-2', time: '早上', title: 'Jing Jai Market 真心市集', type: ActivityType.SHOPPING, location: 'Jing Jai Market Chiang Mai',
-        imageUrl: getImg('1488646953014-85cb44e25828'), estimatedTravelTime: '🚗 15 min'
+        imageUrl: 'https://cc.tvbs.com.tw/img/program/upload/2024/01/02/20240102165046-44bca146.jpg', estimatedTravelTime: '🚗 15 min'
       },
       { id: '3-3', time: '午餐', title: '米其林宮廷泰式餐', type: ActivityType.FOOD, location: 'Saiyut & Doctor Sai Kitchen', estimatedTravelTime: '🚗 15 min' },
       { 

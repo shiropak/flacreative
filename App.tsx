@@ -5,10 +5,12 @@ import { DaySchedule, Activity } from './types';
 import ActivityCard from './components/ActivityCard';
 import ActivityDetail from './components/ActivityDetail';
 import InfoTab from './components/InfoTab';
+import NoticeTab from './components/NoticeTab';
+import ColorWalkTab from './components/ColorWalkTab';
 import { enrichActivity, predictWeather, QuotaExceededError } from './services/geminiService';
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'schedule' | 'info'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'info' | 'notice' | 'colorwalk'>('schedule');
   const [schedule, setSchedule] = useState<DaySchedule[]>(INITIAL_SCHEDULE);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   // CHANGE: Track ID instead of object to allow live updates from background AI processes
@@ -107,6 +109,51 @@ const App: React.FC = () => {
     ? schedule.flatMap(d => d.activities).find(a => a.id === selectedActivityId) 
     : null;
 
+  const renderContent = () => {
+      switch (activeTab) {
+          case 'schedule':
+              return (
+                <div className="animate-fadeIn">
+                    {/* Info Badge Row */}
+                    <div className="flex items-center gap-3 mb-6 overflow-x-auto no-scrollbar">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
+                                <i className="fas fa-calendar text-accent-lime text-xs"></i>
+                                <span className="text-xs font-medium text-text-primary">{currentDay.fullDate}</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap min-w-[5rem] justify-center transition-all duration-500">
+                                <span className="text-sm">{currentDay.weatherIcon}</span>
+                                <span className="text-xs font-medium text-text-primary">{currentDay.weatherRange}</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
+                                <i className="fas fa-tshirt text-accent-lime text-xs"></i>
+                                <span className="text-xs font-medium text-text-primary">{currentDay.dressCode}</span>
+                        </div>
+                    </div>
+
+                    {/* Activity List */}
+                    <div className="pb-4 space-y-2">
+                        {currentDay.activities.map((activity, idx) => (
+                            <ActivityCard 
+                                key={activity.id} 
+                                activity={activity} 
+                                isLast={idx === currentDay.activities.length - 1} 
+                                onClick={() => setSelectedActivityId(activity.id)}
+                            />
+                        ))}
+                    </div>
+                </div>
+              );
+          case 'info':
+              return <InfoTab />;
+          case 'notice':
+              return <NoticeTab />;
+          case 'colorwalk':
+              return <ColorWalkTab />;
+          default:
+              return null;
+      }
+  };
+
   return (
     <div className="min-h-screen w-full bg-app-bg text-text-primary pb-28 relative overflow-x-hidden">
       
@@ -140,7 +187,7 @@ const App: React.FC = () => {
               </div>
           </div>
 
-          {/* Circular Date Selector - Updated Padding/Margin to fix clipping */}
+          {/* Circular Date Selector - Only Show on Schedule Tab */}
           {activeTab === 'schedule' && (
               <div className="flex gap-3 overflow-x-auto no-scrollbar p-6 -mx-6 px-6">
                   {schedule.map((day, idx) => (
@@ -167,66 +214,58 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <div className="relative z-10 px-4 pt-4">
-          {activeTab === 'schedule' ? (
-              <div className="animate-fadeIn">
-                  {/* Info Badge Row */}
-                  <div className="flex items-center gap-3 mb-6 overflow-x-auto no-scrollbar">
-                       <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
-                            <i className="fas fa-calendar text-accent-lime text-xs"></i>
-                            <span className="text-xs font-medium text-text-primary">{currentDay.fullDate}</span>
-                       </div>
-                       <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap min-w-[5rem] justify-center transition-all duration-500">
-                            <span className="text-sm">{currentDay.weatherIcon}</span>
-                            <span className="text-xs font-medium text-text-primary">{currentDay.weatherRange}</span>
-                       </div>
-                       <div className="flex items-center gap-2 px-4 py-2 bg-app-surface2/50 backdrop-blur rounded-full border border-app-border/30 whitespace-nowrap">
-                            <i className="fas fa-tshirt text-accent-lime text-xs"></i>
-                            <span className="text-xs font-medium text-text-primary">{currentDay.dressCode}</span>
-                       </div>
-                  </div>
-
-                  {/* Activity List */}
-                  <div className="pb-4 space-y-2">
-                      {currentDay.activities.map((activity, idx) => (
-                          <ActivityCard 
-                              key={activity.id} 
-                              activity={activity} 
-                              isLast={idx === currentDay.activities.length - 1} 
-                              onClick={() => setSelectedActivityId(activity.id)}
-                          />
-                      ))}
-                  </div>
-              </div>
-          ) : (
-              <InfoTab />
-          )}
+          {renderContent()}
       </div>
 
       {/* Floating Bottom Navigation */}
-      <div className="fixed bottom-8 left-0 w-full flex justify-center z-40 pointer-events-none">
-          <div className="pointer-events-auto bg-[#1E1E1E]/80 border border-white/10 p-1.5 rounded-full shadow-2xl flex items-center gap-1 backdrop-blur-xl">
+      <div className="fixed bottom-8 left-0 w-full flex justify-center z-40 pointer-events-none px-4">
+          <div className="pointer-events-auto bg-[#1E1E1E]/90 border border-white/10 p-1.5 rounded-[2rem] shadow-2xl flex items-center justify-between gap-1 backdrop-blur-xl w-full max-w-sm">
               <button 
                   onClick={() => setActiveTab('schedule')}
-                  className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all duration-300 ${
+                  className={`flex-1 py-3 rounded-[1.5rem] flex flex-col items-center justify-center gap-1 transition-all duration-300 ${
                     activeTab === 'schedule' 
                     ? 'bg-accent-lime text-text-inverse shadow-glow' 
                     : 'text-text-secondary hover:text-white hover:bg-white/5'
                   }`}
               >
-                  <i className="fas fa-map-location-dot text-sm"></i>
-                  <span className="text-sm font-bold">Itinerary</span>
+                  <i className="fas fa-map-location-dot text-lg mb-0.5"></i>
+                  <span className="text-[10px] font-bold uppercase tracking-wide">行程</span>
               </button>
               
               <button 
                   onClick={() => setActiveTab('info')}
-                  className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all duration-300 ${
+                  className={`flex-1 py-3 rounded-[1.5rem] flex flex-col items-center justify-center gap-1 transition-all duration-300 ${
                     activeTab === 'info' 
                     ? 'bg-accent-lime text-text-inverse shadow-glow' 
                     : 'text-text-secondary hover:text-white hover:bg-white/5'
                   }`}
               >
-                  <i className="fas fa-suitcase text-sm"></i>
-                  <span className="text-sm font-bold">Guide</span>
+                  <i className="fas fa-suitcase text-lg mb-0.5"></i>
+                  <span className="text-[10px] font-bold uppercase tracking-wide">資訊</span>
+              </button>
+
+              <button 
+                  onClick={() => setActiveTab('notice')}
+                  className={`flex-1 py-3 rounded-[1.5rem] flex flex-col items-center justify-center gap-1 transition-all duration-300 ${
+                    activeTab === 'notice' 
+                    ? 'bg-accent-lime text-text-inverse shadow-glow' 
+                    : 'text-text-secondary hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                  <i className="fas fa-circle-exclamation text-lg mb-0.5"></i>
+                  <span className="text-[10px] font-bold uppercase tracking-wide">注意</span>
+              </button>
+
+              <button 
+                  onClick={() => setActiveTab('colorwalk')}
+                  className={`flex-1 py-3 rounded-[1.5rem] flex flex-col items-center justify-center gap-1 transition-all duration-300 ${
+                    activeTab === 'colorwalk' 
+                    ? 'bg-accent-lime text-text-inverse shadow-glow' 
+                    : 'text-text-secondary hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                  <i className="fas fa-palette text-lg mb-0.5"></i>
+                  <span className="text-[10px] font-bold uppercase tracking-wide">活動</span>
               </button>
           </div>
       </div>

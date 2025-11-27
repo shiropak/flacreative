@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { FLIGHTS, HOTELS, PACKING_LIST, EMERGENCY_CONTACTS } from '../constants';
+import { FLIGHTS, HOTELS, PACKING_LIST } from '../constants';
 
 const InfoTab: React.FC = () => {
 
@@ -135,40 +136,86 @@ const InfoTab: React.FC = () => {
         </div>
       </section>
 
-      {/* Packing & Emergency Grid */}
-      <div className="grid grid-cols-1 gap-8">
+      {/* Insurance & Tipping Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Insurance Section */}
           <section>
-            <h2 className="text-text-primary text-xl font-bold mb-5 pl-1">Emergency</h2>
-            <div className="grid grid-cols-1 gap-3">
-                {EMERGENCY_CONTACTS.map((contact, idx) => (
-                    <a key={idx} href={`tel:${contact.number}`} className="bg-app-surface p-4 rounded-2xl flex items-center justify-between border border-white/5 hover:border-red-500/30 transition-all group">
-                         <div className="flex items-center gap-4">
-                             <div className="w-10 h-10 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition-colors">
-                                <i className="fas fa-phone"></i>
-                             </div>
-                             <span className="text-sm text-text-primary font-medium">{contact.name}</span>
-                         </div>
-                         <span className="text-xs text-text-muted font-mono">{contact.number}</span>
-                    </a>
-                ))}
-            </div>
+              <h2 className="text-text-primary text-xl font-bold mb-5 pl-1">保險資訊</h2>
+              <div className="bg-app-surface rounded-[2rem] p-6 border border-white/5 h-full flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                              <i className="fas fa-shield-heart"></i>
+                          </div>
+                          <div>
+                              <h3 className="font-bold text-white leading-tight">旅行業責任保險</h3>
+                              <p className="text-[10px] text-text-secondary">旅行社提供之基本保險</p>
+                          </div>
+                      </div>
+                      <ul className="space-y-3 mb-5">
+                          <li className="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                              <span className="text-text-secondary">意外險</span>
+                              <span className="font-bold text-white">250 萬元</span>
+                          </li>
+                          <li className="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                              <span className="text-text-secondary">醫療險</span>
+                              <span className="font-bold text-white">20 萬元</span>
+                          </li>
+                      </ul>
+                    </div>
+                    <div className="bg-red-500/10 p-4 rounded-xl border border-red-500/20">
+                      <p className="text-xs text-red-300 leading-relaxed flex gap-2">
+                          <i className="fas fa-circle-info mt-0.5 flex-shrink-0"></i>
+                          <span>不含旅遊不便險，若有需要額外保險的同仁，請務必自行提前投保喔。</span>
+                      </p>
+                    </div>
+              </div>
           </section>
 
+          {/* Tipping Section */}
           <section>
-            <h2 className="text-text-primary text-xl font-bold mb-5 pl-1">Packing List</h2>
-            <div className="bg-app-surface rounded-[2rem] p-6 border border-white/5">
-                {PACKING_LIST.map((item, idx) => (
-                    <label key={idx} className="flex items-center py-3.5 border-b border-white/5 last:border-0 cursor-pointer group hover:bg-white/5 -mx-2 px-2 rounded-lg transition-colors">
-                         <div className="relative flex items-center justify-center w-6 h-6 mr-3">
-                            <input type="checkbox" className="peer appearance-none w-5 h-5 border-2 border-app-border rounded-md checked:bg-accent-lime checked:border-accent-lime transition-all" />
-                            <i className="fas fa-check absolute text-black text-[10px] opacity-0 peer-checked:opacity-100"></i>
-                        </div>
-                        <span className="text-sm text-text-secondary peer-checked:text-text-muted peer-checked:line-through transition-colors">{item}</span>
-                    </label>
-                ))}
-            </div>
+              <h2 className="text-text-primary text-xl font-bold mb-5 pl-1">小費資訊</h2>
+              <div className="bg-app-surface rounded-[2rem] p-6 border border-white/5 h-full">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-full bg-yellow-500/10 text-yellow-400 flex items-center justify-center">
+                          <i className="fas fa-coins"></i>
+                      </div>
+                      <h3 className="font-bold text-white">建議小費參考</h3>
+                    </div>
+                    <div className="space-y-3">
+                      {[
+                          { label: "古式按摩", value: "50~100 泰銖", sub: "/人/次" },
+                          { label: "行李小費", value: "20 泰銖", sub: "/一間/次" },
+                          { label: "床頭小費", value: "20 泰銖", sub: "/一間/天" },
+                      ].map((tip, idx) => (
+                          <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-app-surface2 border border-white/5">
+                              <span className="text-text-secondary text-sm">{tip.label}</span>
+                              <div className="text-right">
+                                  <span className="text-accent-lime font-bold block">{tip.value}</span>
+                                  <span className="text-[10px] text-text-muted block">{tip.sub}</span>
+                              </div>
+                          </div>
+                      ))}
+                    </div>
+              </div>
           </section>
       </div>
+
+      {/* Packing List Only - Emergency Moved to Notice Tab */}
+      <section>
+        <h2 className="text-text-primary text-xl font-bold mb-5 pl-1">Packing List</h2>
+        <div className="bg-app-surface rounded-[2rem] p-6 border border-white/5">
+            {PACKING_LIST.map((item, idx) => (
+                <label key={idx} className="flex items-center py-3.5 border-b border-white/5 last:border-0 cursor-pointer group hover:bg-white/5 -mx-2 px-2 rounded-lg transition-colors">
+                        <div className="relative flex items-center justify-center w-6 h-6 mr-3">
+                        <input type="checkbox" className="peer appearance-none w-5 h-5 border-2 border-app-border rounded-md checked:bg-accent-lime checked:border-accent-lime transition-all" />
+                        <i className="fas fa-check absolute text-black text-[10px] opacity-0 peer-checked:opacity-100"></i>
+                    </div>
+                    <span className="text-sm text-text-secondary peer-checked:text-text-muted peer-checked:line-through transition-colors">{item}</span>
+                </label>
+            ))}
+        </div>
+      </section>
 
     </div>
   );
