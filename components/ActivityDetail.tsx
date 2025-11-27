@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Activity, ActivityType } from '../types';
 
@@ -29,9 +28,10 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
     };
   }, []);
 
-  const displayImage = (activity.imageUrl && !imgError) 
-    ? activity.imageUrl 
-    : (FALLBACK_IMAGES[activity.type] || FALLBACK_IMAGES.DEFAULT);
+  // LOGIC CHANGE: Only use image if URL exists.
+  const displayImage = activity.imageUrl 
+    ? (imgError ? (FALLBACK_IMAGES[activity.type] || FALLBACK_IMAGES.DEFAULT) : activity.imageUrl)
+    : null;
 
   // Helper for Skeleton Loading
   const LoadingSkeleton = ({ className }: { className?: string }) => (
@@ -40,19 +40,49 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
 
   const hasEnrichedData = !!activity.aiDescription;
 
+  // Helper to nicely format bilingual titles
+  const renderTitle = (title: string) => {
+    // Attempt to split "English Name Chinese Name"
+    const match = title.match(/^([a-zA-Z0-9\s\.\-\(\)&]+)\s+([\u4e00-\u9fa5].*)$/);
+    
+    if (match) {
+        return (
+            <div className="flex flex-col gap-1">
+                <h1 className="text-3xl md:text-4xl font-black text-white leading-none shadow-black drop-shadow-lg pr-4 break-words tracking-tight">
+                    {match[1].trim()}
+                </h1>
+                <h2 className="text-2xl md:text-3xl font-bold text-white/90 leading-tight shadow-black drop-shadow-lg tracking-wide">
+                    {match[2].trim()}
+                </h2>
+            </div>
+        );
+    }
+    
+    return (
+        <h1 className="text-3xl md:text-4xl font-black text-white leading-tight shadow-black drop-shadow-lg pr-4 break-words">
+            {title}
+        </h1>
+    );
+  };
+
   return (
     <div className="fixed inset-0 z-[100] bg-app-bg block overflow-y-auto animate-fadeIn h-full w-full">
       
-      {/* Hero Image Area */}
-      <div className="relative h-[50vh] w-full flex-shrink-0">
-        <img 
-            src={displayImage} 
-            alt={activity.title} 
-            className="w-full h-full object-cover" 
-            onError={() => setImgError(true)}
-        />
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-app-bg"></div>
+      {/* Hero Image Area or Gradient Header */}
+      <div className={`relative w-full flex-shrink-0 ${displayImage ? 'h-[50vh]' : 'pt-24 pb-10'}`}>
+        {displayImage ? (
+             <>
+                <img 
+                    src={displayImage} 
+                    alt={activity.title} 
+                    className="w-full h-full object-cover" 
+                    onError={() => setImgError(true)}
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-app-bg"></div>
+             </>
+        ) : (
+             <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-app-surface2 via-app-surface to-app-bg z-0"></div>
+        )}
         
         {/* Top Nav */}
         <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-start z-20">
@@ -72,7 +102,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
         </div>
 
         {/* Title Overlay */}
-        <div className="absolute bottom-0 left-0 w-full p-6 pb-10 z-10">
+        <div className={`${displayImage ? 'absolute bottom-0 left-0 w-full p-6 pb-10' : 'relative px-6'} z-10`}>
             <div className="flex gap-2 mb-3">
                 <span className="px-3 py-1 rounded-full bg-accent-lime/20 text-accent-lime text-xs font-bold border border-accent-lime/20 backdrop-blur-md">
                     {activity.type}
@@ -83,10 +113,10 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
                     </span>
                 )}
             </div>
-            <h1 className="text-4xl font-black text-white leading-tight shadow-black drop-shadow-lg">
-                {activity.title}
-            </h1>
-            <div className="flex flex-col gap-2 mt-2">
+            
+            {renderTitle(activity.title)}
+
+            <div className="flex flex-col gap-2 mt-4">
                 <div className="flex items-center gap-2 text-gray-300 text-sm">
                     <i className="fas fa-map-marker-alt text-accent-lime"></i>
                     {activity.location || 'Chiang Mai'}
@@ -107,13 +137,13 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
       </div>
 
       {/* Content Body */}
-      <div className="bg-app-bg -mt-6 rounded-t-[2rem] relative z-10 px-6 pt-8 pb-40 space-y-4 min-h-[50vh] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+      <div className={`bg-app-bg ${displayImage ? '-mt-6 rounded-t-[2rem]' : '-mt-6 rounded-t-[2rem]'} relative z-10 px-6 pt-8 pb-40 space-y-4 min-h-[50vh] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]`}>
          
          {/* Introduction (Description) - Card Style */}
-         <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+         <div className="bg-app-surface p-6 rounded-2xl border border-white/5">
              <div className="flex items-center gap-2 mb-3 text-accent-lime">
                  <i className="fas fa-circle-info"></i>
-                 <span className="text-xs font-bold uppercase tracking-wider">說明</span>
+                 <span className="text-xs font-bold uppercase tracking-wider">行程說明</span>
              </div>
              {hasEnrichedData ? (
                  <p className="text-text-secondary leading-relaxed font-light text-justify text-sm">
@@ -130,8 +160,8 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
 
          {/* Important Reservation Info - Distinct Warning Card */}
          {activity.reservationInfo && (
-             <div className="bg-red-500/10 p-5 rounded-2xl border border-red-500/20">
-                 <div className="flex items-center gap-2 mb-2 text-red-400">
+             <div className="bg-red-500/10 p-6 rounded-2xl border border-red-500/20">
+                 <div className="flex items-center gap-2 mb-3 text-red-400">
                      <i className="fas fa-exclamation-circle"></i>
                      <span className="text-xs font-bold uppercase tracking-wider">訂位資訊</span>
                  </div>
@@ -142,7 +172,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
          {/* Notes & Cautions - Card Style */}
          {hasEnrichedData ? (
              activity.notes && activity.notes.length > 0 && (
-                 <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+                 <div className="bg-app-surface p-6 rounded-2xl border border-white/5">
                      <div className="flex items-center gap-2 mb-3 text-yellow-500">
                          <i className="fas fa-triangle-exclamation"></i>
                          <span className="text-xs font-bold uppercase tracking-wider">注意事項</span>
@@ -161,7 +191,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
 
          {/* Must Eat - Card Style */}
          {(activity.type === ActivityType.FOOD || activity.type === ActivityType.SIGHTSEEING) && (
-             <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+             <div className="bg-app-surface p-6 rounded-2xl border border-white/5">
                  <div className="flex items-center gap-2 mb-3 text-orange-400">
                      <i className="fas fa-utensils"></i>
                      <span className="text-xs font-bold uppercase tracking-wider">必吃美食 & 菜單</span>
@@ -187,7 +217,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
 
          {/* Must Buy - Card Style */}
          {(activity.type === ActivityType.SHOPPING || activity.type === ActivityType.SIGHTSEEING) && (
-             <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+             <div className="bg-app-surface p-6 rounded-2xl border border-white/5">
                  <div className="flex items-center gap-2 mb-3 text-purple-400">
                      <i className="fas fa-gift"></i>
                      <span className="text-xs font-bold uppercase tracking-wider">必買伴手禮</span>
@@ -214,7 +244,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
          {/* Tips - Card Style */}
          {hasEnrichedData ? (
              activity.tips && activity.tips.length > 0 && (
-                 <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
+                 <div className="bg-app-surface p-6 rounded-2xl border border-white/5">
                      <div className="flex items-center gap-2 mb-3 text-accent-lime">
                          <i className="fas fa-lightbulb"></i>
                          <span className="text-xs font-bold uppercase tracking-wider">旅遊攻略</span>

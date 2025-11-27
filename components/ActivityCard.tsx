@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Activity, ActivityType } from '../types';
 
@@ -46,9 +45,11 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
   };
 
   // Determine which image to show
-  const displayImage = (activity.imageUrl && !imgError) 
-    ? activity.imageUrl 
-    : (FALLBACK_IMAGES[activity.type] || FALLBACK_IMAGES.DEFAULT);
+  // LOGIC CHANGE: Only show image if URL exists. If URL exists but errors, show fallback.
+  // If URL is undefined/empty, show NO image (text card).
+  const displayImage = activity.imageUrl 
+    ? (imgError ? (FALLBACK_IMAGES[activity.type] || FALLBACK_IMAGES.DEFAULT) : activity.imageUrl)
+    : null;
 
   return (
     <div className="relative flex group cursor-pointer w-full" onClick={onClick}>
@@ -87,23 +88,23 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
       <div className="flex-1 pb-8 min-w-0">
          <div className="bg-app-surface rounded-[1.5rem] border border-white/5 shadow-lg hover:border-accent-lime/50 transition-all duration-300 overflow-hidden group-active:scale-[0.99] w-full flex flex-col">
              
-             {/* Image Header (Full Width) - ALWAYS SHOWS IMAGE */}
-             <div className="w-full h-48 bg-app-surface2 relative overflow-hidden">
-                 <img 
-                    src={displayImage}
-                    alt={activity.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                    loading="lazy" 
-                    onError={() => setImgError(true)}
-                 />
-                 
-                 {/* Type Badge Overlay */}
-                 <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] font-bold border border-white/10">
-                        {activity.type}
-                    </span>
+             {/* Image Header (Conditional) */}
+             {displayImage ? (
+                 <div className="w-full h-48 bg-app-surface2 relative overflow-hidden">
+                     <img 
+                        src={displayImage}
+                        alt={activity.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                        loading="lazy" 
+                        onError={() => setImgError(true)}
+                     />
+                     <div className="absolute top-3 left-3">
+                        <span className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] font-bold border border-white/10">
+                            {activity.type}
+                        </span>
+                     </div>
                  </div>
-             </div>
+             ) : null}
 
              {/* Text Content Body */}
              <div className="p-5 flex flex-col gap-3">
@@ -111,30 +112,34 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, isLast, onClick }
                     <h3 className="text-lg font-bold text-text-primary leading-tight group-hover:text-accent-lime transition-colors">
                         {activity.title}
                     </h3>
-                    <p className="text-xs text-text-secondary mt-1 flex items-center gap-1">
-                        <i className="fas fa-map-marker-alt text-accent-lime/70"></i>
-                        {activity.location || activity.originalDescription}
-                    </p>
+                    {(activity.location || activity.originalDescription) && (
+                        <p className="text-xs text-text-secondary mt-1 flex items-center gap-1">
+                            <i className="fas fa-map-marker-alt text-accent-lime/70"></i>
+                            {activity.location || activity.originalDescription}
+                        </p>
+                    )}
                  </div>
 
                  {/* AI Tags Display Area - Safely Mapped */}
-                 <div className="flex flex-wrap gap-2 mt-1">
-                     {activity.mustEat?.slice(0, 3).map((food, i) => (
-                         <span key={`food-${i}`} className="text-[10px] px-2 py-1 bg-orange-500/10 text-orange-300 rounded-md border border-orange-500/20 truncate max-w-full">
-                             <i className="fas fa-utensils text-[8px] mr-1 opacity-70"></i>{food}
-                         </span>
-                     ))}
-                     {activity.mustBuy?.slice(0, 2).map((item, i) => (
-                         <span key={`buy-${i}`} className="text-[10px] px-2 py-1 bg-purple-500/10 text-purple-300 rounded-md border border-purple-500/20 truncate max-w-full">
-                             <i className="fas fa-gift text-[8px] mr-1 opacity-70"></i>{item}
-                         </span>
-                     ))}
-                     {activity.tips && activity.tips.length > 0 && (
-                          <span className="text-[10px] px-2 py-1 bg-blue-500/10 text-blue-300 rounded-md border border-blue-500/20 truncate max-w-full">
-                             <i className="fas fa-lightbulb text-[8px] mr-1 opacity-70"></i>攻略
-                         </span>
-                     )}
-                 </div>
+                 {(activity.mustEat?.length || activity.mustBuy?.length || activity.tips?.length) ? (
+                     <div className="flex flex-wrap gap-2 mt-1">
+                         {activity.mustEat?.slice(0, 3).map((food, i) => (
+                             <span key={`food-${i}`} className="text-[10px] px-2 py-1 bg-orange-500/10 text-orange-300 rounded-md border border-orange-500/20 truncate max-w-full">
+                                 <i className="fas fa-utensils text-[8px] mr-1 opacity-70"></i>{food}
+                             </span>
+                         ))}
+                         {activity.mustBuy?.slice(0, 2).map((item, i) => (
+                             <span key={`buy-${i}`} className="text-[10px] px-2 py-1 bg-purple-500/10 text-purple-300 rounded-md border border-purple-500/20 truncate max-w-full">
+                                 <i className="fas fa-gift text-[8px] mr-1 opacity-70"></i>{item}
+                             </span>
+                         ))}
+                         {activity.tips && activity.tips.length > 0 && (
+                              <span className="text-[10px] px-2 py-1 bg-blue-500/10 text-blue-300 rounded-md border border-blue-500/20 truncate max-w-full">
+                                 <i className="fas fa-lightbulb text-[8px] mr-1 opacity-70"></i>攻略
+                             </span>
+                         )}
+                     </div>
+                 ) : null}
 
                  {/* View Details Link */}
                  <div className="flex justify-between items-center pt-2 border-t border-white/5 mt-1">

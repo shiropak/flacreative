@@ -1,4 +1,3 @@
-
 import { DaySchedule, ActivityType, FlightInfo, HotelInfo, Activity } from './types';
 
 export const FLIGHTS: FlightInfo[] = [
@@ -86,7 +85,7 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
         estimatedTravelTime: "🚗 10 min", // Nearby
     },
     '1-7': { // White Temple
-        aiDescription: "龍坤藝術廟 (白廟) 是由泰國著名藝術家 Chalermchai Kositpipat 設計。整座寺廟以純白象徵佛陀的純潔，鑲嵌的鏡片在陽光下閃耀著智慧之光。這不僅是寺廟，更是一件震撼的現代藝術品。",
+        aiDescription: "由泰國名藝術家–查仁猜師父，花十年多時間所建造，獨具的泰國風格把仙境模擬於人間，同時也讓您理解到廣結善緣、惡必有報的人生理論，是一座費盡心思、巧奪天工的白色寺廟。廟堂外觀裝飾鏡子碎片，山形窗則裝飾著Nagas( 多頭蛇和幽冥世界之神祗 ) 、大象及傘等形狀。內部有查仁猜師父手繪的巨幅佛像壁畫。此廟結合傳統與現代創作的藝術塊寶，展現泰國國寶級藝術家的創意。",
         openingHours: "08:00 - 17:00",
         estimatedTravelTime: "🚗 50 min", // Mae Kachan -> White Temple
         mustEat: ["椰子冰淇淋 (門口)", "泰式奶茶"],
@@ -117,7 +116,7 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
     
     // Day 2
     '2-2': { // Blue Temple
-        aiDescription: "清萊藍廟 (Wat Rong Suea Ten) 以其鮮豔的寶藍色與金色為主調，內部巨大的白色佛像在藍色背景下顯得莊嚴而神聖。壁畫風格現代且迷幻，視覺衝擊力極強。",
+        aiDescription: "又名舞虎寺(Blue Temple ; Wat RongSuea Ten ; วัดร่องเสือเต้น)，泰文原意為「跳舞的老虎」，始建於1996年。藍廟由清萊白廟設計者的徒弟所設計建造，雖然規模較白廟小，但是整體外觀呈現耀眼宏偉的藍色，內部佛像精緻，是一座傳統與現代藝術完美融合的泰式寺廟。",
         openingHours: "07:00 - 20:00",
         estimatedTravelTime: "🚗 15 min",
         mustEat: ["藍色椰子冰淇淋 (特色)", "蝶豆花飲品"],
@@ -132,7 +131,7 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
         notes: ["排骨稍微偏辣", "建議戴手套食用"]
     },
     '2-4': { // Coconut Market
-        aiDescription: "充滿熱帶風情的椰林市集 (Coconut Market)，彷彿置身夏威夷。這裡主要販售當地農產品、手工藝品與特色小吃，環境在椰子樹蔭下非常舒適，是週末放鬆的好去處。",
+        aiDescription: "周末限定「椰林市集 Coconut Market」，市集距離古城大約車程 15 分鐘，風景非常漂亮，市集是設置在椰子種植園區內。雖然市集的攤販數量不算很多，逛起來約20分鐘就結束了，但是整體的氛圍是其他市集絕對沒有的，還是很推薦可以來這裡逛逛小市集、市集買點泰式小吃。餓一下小羊喝牛奶，再買顆椰子喝！",
         openingHours: "08:00 - 14:00 (週末限定)",
         estimatedTravelTime: "🚗 20 min",
         mustEat: ["椰子殼裝咖啡", "彩色泰式甜點", "烤芭蕉"],
@@ -144,7 +143,7 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
          estimatedTravelTime: "🚗 20 min",
     },
     '2-6': { // Warorot
-        aiDescription: "瓦洛洛市場 (Warorot Market) 是清邁最古老、最道地的傳統市場，在地人稱為『咖龍』。這裡白天賣乾貨布料，晚上變身熱鬧夜市，是購買伴手禮最齊全也最便宜的地方。",
+        aiDescription: "位於古城附近，是清邁最大的市集也是清邁的唐人街，建築風格與曼谷的唐人街類似。瓦洛洛市場分為三層樓，伴手禮、美食、便宜的衣服在這裡都應有盡有。",
         openingHours: "05:00 - 23:00",
         estimatedTravelTime: "🚗 15 min",
         mustEat: ["泰北炸香腸 (Sai Ua)", "炸豬皮", "芒果糯米飯"],
@@ -152,25 +151,33 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
         tips: ["記得殺價", "龍眼乾是特產"],
         notes: ["人潮擁擠注意財物", "市場內部較為悶熱"]
     },
-    '2-7': { // Big C
+    '2-7': { // Anusarn Market
+        aiDescription: "清邁觀光夜市裡面其實還包含2個夜市，分別是「阿努善夜市」跟「清邁卡爾拉夜市」，「阿努善夜市」的範圍從阿努善市場入口外的街道到市場內，攤位的質感都滿好的；「卡爾拉夜市」是室內夜市，主要是美食廣場，選擇很多，環境也很乾淨，整個「清邁觀光夜市」涵蓋的範圍非常大聚集了各式各樣的美食小吃攤販，從傳統泰食到各國美食通通都有，夜市中央還有美食座位區可以用餐。",
+        openingHours: "16:00 - 23:30",
+        estimatedTravelTime: "🚗 15 min",
+        mustEat: ["烤魚","芒果糯米飯"],
+        tips: ["東西重複性很高，建議大家可以多比價再購買", "龍眼乾是特產"],
+        notes: ["人潮擁擠注意財物", "謹慎生食"]
+    },    
+    '2-8': { // Big C
          estimatedTravelTime: "🚗 15 min",
     },
-    '2-8': { // Hotel
+    '2-9': { // Hotel
          estimatedTravelTime: "🚗 10 min",
     },
 
     // Day 3
     '3-2': { // Jing Jai Market
-        aiDescription: "Jing Jai Market (真心市集) 是清邁目前最火紅的文青市集。主打有機農產、手作工藝與環保理念。這裡的商品質感極佳，且重視原創設計，週末早上有現場音樂，氛圍非常Chill。",
+        aiDescription: "清邁最人氣的文青市集和手工藝市集，也是第一個有機農產市集，這裡的商店和店家都是每天營業，但周末會有超大型的假日市集，不定期還會舉辦一些活動",
         openingHours: "06:30 - 13:00 (週末早市)",
         estimatedTravelTime: "🚗 15 min",
         mustEat: ["有機咖啡", "泰式煎餅", "手作麵包"],
         mustBuy: ["設計師棉麻衣物", "手工陶器", "天然護膚品"],
-        tips: ["一定要早上去，中午就收了", "絕佳的文青照拍攝地"],
-        notes: ["提倡減塑，建議自備購物袋"]
+        tips: ["如果逛街累了可抓時間去按摩"],
+        notes: ["由於觀光客日益增加，近期還有中國直播帶貨，所以價格會相對比較貴。"]
     },
     '3-3': { // Michelin Thai
-        aiDescription: "品嚐米其林推薦的泰國宮廷料理，精緻的擺盤與細膩的調味，重現過往皇室的用餐體驗。環境優雅，服務周到。",
+        aiDescription: "2020年起，在泰國清邁餐廳連續五年榮獲米其林必比登推介，以手工製作的菜餚與用心服務一直是許多當地人與遊客必訪的餐廳，能感受到地道泰式家庭氛圍，又能品嚐傳統與創新結合的美食，那麼 Saiyut & Doctor Sai Kitchen 絕對是一個不可錯過的餐廳選擇，這家由母女檔創立的私廚餐廳，以「美食即是生活中的藝術」為理念，不僅有豐富的泰式菜餚，還兼具藝術的擺盤與溫馨的用餐環境。",
         openingHours: "11:00 - 15:00, 17:00 - 22:00",
         estimatedTravelTime: "🚗 15 min",
         mustEat: ["宮廷開胃菜組合", "瑪莎曼咖哩", "柚子沙拉"],
@@ -208,17 +215,16 @@ export const ACTIVITY_DETAILS: Record<string, Partial<Activity>> = {
 
     // Day 4
     '4-2': { // Doi Inthanon
-        aiDescription: "茵他儂國家公園是泰國的最高峰，被稱為『泰國屋脊』。這裡氣候終年涼爽，擁有多樣的生態系。著名的國王塔與皇后塔矗立於山頂，花園景觀極美。",
+        aiDescription: "是泰國的國家自然保護區。佔地面積 1005 平方公里，擁有泰國最高山脈茵他儂山，該山最高峰海拔約 2565 米，四周是山峰，有許多徒步路線、瀑布和兩座紀念佛塔。除了來清邁旅遊的遊客會造訪外，這裡也非常受當地人青睞。",
         openingHours: "05:00 - 18:00",
         estimatedTravelTime: "🚗 2 hr", // City -> Mountain Top (~2hr)
-        tips: ["山上氣溫低，務必帶外套", "走步道可以看見雲海"],
-        notes: ["山路蜿蜒，會暈車者請先吃藥", "請勿摘採花木"]
+        notes: ["山上氣溫比市區低10°C，務必帶外套", "請注意防蚊防曬", "山路蜿蜒，會暈車者請先吃藥", "建議穿著舒適的衣服與鞋子上山"]
     },
     '4-3': { // Lunch
          estimatedTravelTime: "🚗 30 min",
     },
     '4-4': { // Kad Farang
-        aiDescription: "Kad Farang Village 是一座蘭納風格的購物村，這裡有著『全球最美的星巴克』之一。純白的泰式建築搭配精緻木雕，是必訪的打卡熱點。",
+        aiDescription: "跟一般的百貨公司不一樣，有更開闊更舒適的腹地，提供超過2000個車位，到這來逛街是件非常享受悠閒的事情，旁邊還有全清邁唯一的Outlet購物中心可以讓你逛一整天都不是問題，而購物村裡面的蘭納風星巴克可是享有泰北最美星巴克的稱號。",
         openingHours: "10:00 - 21:00",
         estimatedTravelTime: "🚗 1.5 hr", // Mountain -> City Outskirts
         mustEat: ["星巴克特色飲品", "週三夜市小吃"],
@@ -267,37 +273,34 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     dressCode: '白+淺藍',
     activities: [
       { 
-        id: '1-1', time: '03:30', title: '公司→桃園國際機場', type: ActivityType.TRANSPORT, location: '法樂數位', imageUrl: getImg('1436491865332-7a61a109cc05'), originalDescription: '遊覽車', estimatedTravelTime: '🚌 45 min'
+        id: '1-1', time: '03:30', title: '公司→桃園國際機場', type: ActivityType.TRANSPORT, location: '法樂數位', originalDescription: '遊覽車', estimatedTravelTime: '🚌 45 min'
       },
       { 
-        id: '1-2', time: '07:20', title: 'CI851 TPE[1] ✈︎ CNX', type: ActivityType.FLIGHT, location: 'Taoyuan International Airport', originalDescription: '中華航空 CI 851',
-        imageUrl: getImg('1436491865332-7a61a109cc05'), estimatedTravelTime: '✈️ 4hr 5m'
+        id: '1-2', time: '07:20', title: 'CI851 TPE[1] ✈︎ CNX', type: ActivityType.FLIGHT, location: 'Taoyuan International Airport', originalDescription: '中華航空 CI 851', estimatedTravelTime: '✈️ 4hr 5m'
       },
-      { id: '1-3', time: '早餐', title: '飛機餐', type: ActivityType.FOOD, imageUrl: getImg('1542338547-93fa31ea8e6c'), estimatedTravelTime: '' },
+      { id: '1-3', time: '早餐', title: '飛機餐', type: ActivityType.FOOD, estimatedTravelTime: '' 
+      },
       { 
-        id: '1-4', time: '10:25', title: '抵達清邁國際機場', type: ActivityType.FLIGHT, location: 'Chiang Mai International Airport',
-        imageUrl: getImg('1569336685283-13b2287ebbb9'), estimatedTravelTime: '✈️'
+        id: '1-4', time: '10:25', title: '抵達清邁國際機場', type: ActivityType.FLIGHT, location: 'Chiang Mai International Airport', estimatedTravelTime: '✈️'
       },
       { 
         id: '1-5', time: '', title: '清萊溫泉休息站', type: ActivityType.SIGHTSEEING, location: 'Mae Kachan Hot Spring',
         imageUrl: getImg('1569336685283-13b2287ebbb9'), estimatedTravelTime: '🚌 1.5 hr'
       },
-      { id: '1-6', time: '午餐', title: '泰式自助餐', type: ActivityType.FOOD, imageUrl: getImg('1559314809-0d155014e29e'), estimatedTravelTime: '🚗 10 min' },
+      { id: '1-6', time: '午餐', title: '泰式自助餐', type: ActivityType.FOOD, estimatedTravelTime: '🚗 10 min' },
       {
         id: '1-7', time: '下午', title: '龍坤藝術廟', type: ActivityType.SIGHTSEEING, location: 'Wat Rong Khun', originalDescription: '龍坤藝術廟',
-        imageUrl: 'https://images.unsplash.com/photo-1671188893377-ee825a53d27f?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', estimatedTravelTime: '🚗 50 min'
+        imageUrl: 'https://images.unsplash.com/photo-1626514759600-4b24874c7e65?auto=format&fit=crop&w=800&q=80', estimatedTravelTime: '🚗 50 min'
       },
       { 
         id: '1-8', time: '下午', title: '翠峰茶園', type: ActivityType.SIGHTSEEING, location: 'Choui Fong Tea Plantation',
         imageUrl: getImg('1586631006920-4c6b7745971e'), estimatedTravelTime: '🚗 1 hr'
       },
       { 
-        id: '1-9', time: '晚餐', title: 'Moon Mai Restaurant 孟美餐廳', type: ActivityType.FOOD, location: 'Moon Mai Restaurant', originalDescription: '北部佳餚風味餐+現場歌手演唱',
-        imageUrl: getImg('1517248135467-4c7edcad34c4'), estimatedTravelTime: '🚗 45 min'
+        id: '1-9', time: '晚餐', title: 'Moon Mai Restaurant 孟美餐廳', type: ActivityType.FOOD, location: 'Moon Mai Restaurant', originalDescription: '北部佳餚風味餐+現場歌手演唱', estimatedTravelTime: '🚗 45 min'
       },
       { 
-        id: '1-10', time: '住宿', title: 'The Mantrini Chiang Rai Resort', type: ActivityType.HOTEL, location: 'The Mantrini Chiang Rai Resort',
-        imageUrl: getImg('1566073771259-6a8506099945'), estimatedTravelTime: '🚗 15 min'
+        id: '1-10', time: '住宿', title: 'The Mantrini Chiang Rai Resort', type: ActivityType.HOTEL, location: 'The Mantrini Chiang Rai Resort', estimatedTravelTime: '🚗 15 min'
       }
     ]
   },
@@ -309,28 +312,31 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     weatherIcon: '⏳',
     dressCode: '米白/大地色',
     activities: [
-      { id: '2-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, location: 'The Mantrini Chiang Rai Resort', imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '' },
+      { id: '2-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, location: 'The Mantrini Chiang Rai Resort', estimatedTravelTime: '' 
+      },
       { 
         id: '2-2', time: '早上', title: '清萊藍廟 (Wat Rong Suea Ten)', type: ActivityType.SIGHTSEEING, location: 'Wat Rong Suea Ten (Blue Temple)',
         imageUrl: 'https://images.unsplash.com/photo-1707788795785-d6480a45e200?q=80&w=2664&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', estimatedTravelTime: '🚗 15 min'
       },
       { 
-        id: '2-3', time: '午餐', title: '火山排骨龍蝦麵 + 蝶豆花創意飲品', type: ActivityType.FOOD, location: 'Chiang Mai',
-        imageUrl: getImg('1596627229722-9f669da39580'), estimatedTravelTime: '🚌 3.5 hr'
+        id: '2-3', time: '午餐', title: '火山排骨龍蝦麵 + 蝶豆花創意飲品', type: ActivityType.FOOD, location: 'Chiang Mai', estimatedTravelTime: '🚌 3.5 hr'
       },
       { 
-        id: '2-4', time: '下午', title: '清邁真心市集 / 椰林市集', type: ActivityType.SIGHTSEEING, location: 'Coconut Market Chiang Mai', originalDescription: '週末市集',
+        id: '2-4', time: '下午', title: '椰林市集', type: ActivityType.SIGHTSEEING, location: 'Coconut Market Chiang Mai', originalDescription: '週末市集',
         imageUrl: getImg('1533025404451-826cb4c32b41'), estimatedTravelTime: '🚗 20 min'
       },
-      { id: '2-5', time: '晚餐', title: 'Kung Yim Shop (2 Branch)', type: ActivityType.FOOD, location: 'Kung Yim Shop', imageUrl: getImg('1562565652-95e7ebf371f1'), estimatedTravelTime: '🚗 20 min' },
+      { id: '2-5', time: '晚餐', title: 'Kung Yim Shop (2 Branch)', type: ActivityType.FOOD, location: 'Kung Yim Shop', estimatedTravelTime: '🚗 20 min' },
       { 
-        id: '2-6', time: '晚上', title: '清邁夜市 / 瓦洛洛市場', type: ActivityType.SHOPPING, location: 'Waroros Market (Kad Luang)', originalDescription: '必逛在地市集',
+        id: '2-6', time: '晚上', title: '瓦洛洛市場', type: ActivityType.SHOPPING, location: 'Waroros Market (Kad Luang)', originalDescription: '必逛在地市集',
+        imageUrl: 'https://i0.wp.com/journey.tw/wp-content/uploads/2025/07/20250728023617_0_9dcdc1.jpg?resize=1100%2C732&quality=99&ssl=1', estimatedTravelTime: '🚗 15 min'
+      },
+        { 
+        id: '2-7', time: '晚上', title: '清邁夜市', type: ActivityType.SHOPPING, location: 'Kalare Night Bazaar', originalDescription: '必逛在地市集',
         imageUrl: getImg('1505881502353-a1986add3762'), estimatedTravelTime: '🚗 15 min'
       },
-      { id: '2-7', time: '晚上', title: 'Big C Extra 採購', type: ActivityType.SHOPPING, location: 'Big C Extra Chiang Mai 2', imageUrl: getImg('1534452203293-494d7ddbf7e0'), estimatedTravelTime: '🚗 15 min' },
+      { id: '2-8', time: '晚上', title: 'Big C Extra 採購', type: ActivityType.SHOPPING, location: 'Big C Extra Chiang Mai 2', estimatedTravelTime: '🚗 15 min' },
       { 
-        id: '2-8', time: '住宿', title: 'The Raintree Hotel', type: ActivityType.HOTEL, location: 'The Raintree Hotel Chiang Mai',
-        imageUrl: getImg('1542314831-068cd1dbfeeb'), estimatedTravelTime: '🚗 10 min'
+        id: '2-9', time: '住宿', title: 'The Raintree Hotel', type: ActivityType.HOTEL, location: 'The Raintree Hotel Chiang Mai', estimatedTravelTime: '🚗 10 min'
       }
     ]
   },
@@ -342,23 +348,23 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     weatherIcon: '⏳',
     dressCode: '泰服',
     activities: [
-      { id: '3-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, location: 'The Raintree Hotel Chiang Mai', imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '' },
+      { id: '3-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, location: 'The Raintree Hotel Chiang Mai', estimatedTravelTime: '' 
+      },
       { 
         id: '3-2', time: '早上', title: 'Jing Jai Market 真心市集', type: ActivityType.SHOPPING, location: 'Jing Jai Market Chiang Mai',
         imageUrl: getImg('1488646953014-85cb44e25828'), estimatedTravelTime: '🚗 15 min'
       },
-      { id: '3-3', time: '午餐', title: '米其林宮廷泰式餐', type: ActivityType.FOOD, imageUrl: getImg('1548943487-a2e4e43b485c'), estimatedTravelTime: '🚗 15 min' },
+      { id: '3-3', time: '午餐', title: '米其林宮廷泰式餐', type: ActivityType.FOOD, location: 'Saiyut & Doctor Sai Kitchen', estimatedTravelTime: '🚗 15 min' },
       { 
-        id: '3-4', time: '下午', title: '泰服體驗', type: ActivityType.ACTIVITY, originalDescription: '換裝體驗',
-        imageUrl: getImg('1599707367072-cd6c66aa22f1'), estimatedTravelTime: '🚗 10 min'
+        id: '3-4', time: '下午', title: '泰服體驗', type: ActivityType.ACTIVITY, originalDescription: '換裝體驗', estimatedTravelTime: '🚗 10 min'
       },
       { 
         id: '3-5', time: '下午', title: '蘭納古城之旅', type: ActivityType.SIGHTSEEING, location: 'Three Kings Monument', originalDescription: '大塔寺、水果街、三王紀念碑',
         imageUrl: getImg('1528181304800-259b08848526'), estimatedTravelTime: '🚶 5 min'
       },
-      { id: '3-6', time: '下午', title: '泰式按摩', type: ActivityType.ACTIVITY, imageUrl: getImg('1544161515-4ab6ce6db874'), estimatedTravelTime: '🚗 10 min' },
-      { id: '3-7', time: '晚餐', title: '米其林謝桐興餐廳', type: ActivityType.FOOD, location: 'Jia Tong Heng Restaurant', imageUrl: getImg('1514933651103-005eec06c04b'), estimatedTravelTime: '🚗 20 min' },
-      { id: '3-8', time: '住宿', title: 'The Raintree Hotel', type: ActivityType.HOTEL, location: 'The Raintree Hotel Chiang Mai', imageUrl: getImg('1542314831-068cd1dbfeeb'), estimatedTravelTime: '🚗 15 min' }
+      { id: '3-6', time: '下午', title: '泰式按摩', type: ActivityType.ACTIVITY, estimatedTravelTime: '🚗 10 min' },
+      { id: '3-7', time: '晚餐', title: '米其林謝桐興餐廳', type: ActivityType.FOOD, location: 'Jia Tong Heng Restaurant', estimatedTravelTime: '🚗 20 min' },
+      { id: '3-8', time: '住宿', title: 'The Raintree Hotel', type: ActivityType.HOTEL, location: 'The Raintree Hotel Chiang Mai', estimatedTravelTime: '🚗 15 min' }
     ]
   },
   {
@@ -369,20 +375,21 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     weatherIcon: '⏳',
     dressCode: '綠色',
     activities: [
-      { id: '4-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, location: 'The Raintree Hotel Chiang Mai', imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '' },
+      { id: '4-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, location: 'The Raintree Hotel Chiang Mai', estimatedTravelTime: '' 
+      },
       { 
         id: '4-2', time: '早上', title: '茵他儂國家公園', type: ActivityType.SIGHTSEEING, location: 'Doi Inthanon National Park',
-        imageUrl: getImg('1520334292791-75c941c90303'), estimatedTravelTime: '🚗 2 hr'
+        imageUrl: 'https://image.kkday.com/v2/image/get/c_fit%2Cq_55%2Ct_webp%2Cw_960/s1.kkday.com/product_133330/20220917104810_jBhSU/jpg', estimatedTravelTime: '🚗 2 hr'
       },
-      { id: '4-3', time: '午餐', title: '茵他儂風味餐', type: ActivityType.FOOD, imageUrl: getImg('1504674900247-0877df9cc836'), estimatedTravelTime: '🚗 30 min' },
+      { id: '4-3', time: '午餐', title: '茵他儂風味餐', type: ActivityType.FOOD, estimatedTravelTime: '🚗 30 min' },
       { 
-        id: '4-4', time: '下午', title: 'Kad Farang Village 市集', type: ActivityType.SHOPPING, location: 'Kad Farang Village',
-        imageUrl: getImg('1441986300917-64674bd600d8'), estimatedTravelTime: '🚗 1.5 hr'
+        id: '4-4', time: '下午', title: 'Kad Farang Village', type: ActivityType.SHOPPING, location: 'Kad Farang Village',
+        imageUrl: 'https://api.tourismthailand.org/upload/live/business_content_thumbnail/12603/P06002143.jpeg', estimatedTravelTime: '🚗 1.5 hr'
       },
-      { id: '4-5', time: '下午', title: 'PREMIUM OUTLET', type: ActivityType.SHOPPING, location: 'Premium Outlet Chiang Mai', imageUrl: getImg('1555529669-e69e7aa0ba9a'), estimatedTravelTime: '🚶 5 min' },
-      { id: '4-6', time: '下午', title: '蘭納風星巴克', type: ActivityType.FOOD, location: 'Starbucks Kad Farang', imageUrl: getImg('1559496417-e7f25cb247f3'), estimatedTravelTime: '🚶 2 min' },
-      { id: '4-7', time: '晚餐', title: '米其林黑森林泰式餐', type: ActivityType.FOOD, location: 'Khaomao-Khaofang Restaurant', imageUrl: getImg('1550966871-3ed3c6221741'), estimatedTravelTime: '🚗 15 min' },
-      { id: '4-8', time: '住宿', title: 'The Raintree Hotel', type: ActivityType.HOTEL, imageUrl: getImg('1542314831-068cd1dbfeeb'), estimatedTravelTime: '🚗 25 min' }
+      { id: '4-5', time: '下午', title: 'PREMIUM OUTLET', type: ActivityType.SHOPPING, location: 'Premium Outlet Chiang Mai', estimatedTravelTime: '🚶 5 min' },
+      { id: '4-6', time: '下午', title: '蘭納風星巴克', type: ActivityType.FOOD, location: 'Starbucks Kad Farang', imageUrl: 'https://cc.tvbs.com.tw/img/program/upload/2024/06/18/20240618143959-993eefd8.jpg', estimatedTravelTime: '🚶 2 min' },
+      { id: '4-7', time: '晚餐', title: '米其林黑森林泰式餐', type: ActivityType.FOOD, location: 'Khaomao-Khaofang Restaurant', estimatedTravelTime: '🚗 15 min' },
+      { id: '4-8', time: '住宿', title: 'The Raintree Hotel', type: ActivityType.HOTEL, estimatedTravelTime: '🚗 25 min' }
     ]
   },
   {
@@ -393,10 +400,12 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
     weatherIcon: '⏳',
     dressCode: '無',
     activities: [
-      { id: '5-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, location: 'The Raintree Hotel Chiang Mai', imageUrl: getImg('1504754524776-8f4f37790ca0'), estimatedTravelTime: '🚗 25 min' },
-      { id: '5-2', time: '11:25', title: '出發：清邁國際機場 (CI852)', type: ActivityType.FLIGHT, location: 'Chiang Mai International Airport', imageUrl: getImg('1569336685283-13b2287ebbb9'), estimatedTravelTime: '🚗 25 min' },
-      { id: '5-3', time: '午餐', title: '飛機餐', type: ActivityType.FOOD, imageUrl: getImg('1542338547-93fa31ea8e6c'), estimatedTravelTime: '✈️' },
-      { id: '5-4', time: '15:50', title: '抵達：桃園國際機場 T1', type: ActivityType.FLIGHT, location: 'Taoyuan International Airport', imageUrl: getImg('1570710891163-6d3b5c47248b') }
+      { id: '5-1', time: '早上', title: '飯店早餐', type: ActivityType.FOOD, location: 'The Raintree Hotel Chiang Mai', estimatedTravelTime: '🚗 25 min' 
+      },
+      { id: '5-2', time: '11:25', title: 'CI852 CNX ✈︎ TPE[1]', type: ActivityType.FLIGHT, location: 'Chiang Mai International Airport', estimatedTravelTime: '🚗 25 min' },
+      { id: '5-3', time: '午餐', title: '飛機餐', type: ActivityType.FOOD, estimatedTravelTime: '✈️' 
+      },
+      { id: '5-4', time: '15:50', title: '抵達：桃園國際機場 T1', type: ActivityType.FLIGHT, location: 'Taoyuan International Airport' }
     ]
   }
 ];

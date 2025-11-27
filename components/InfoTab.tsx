@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { FLIGHTS, HOTELS, PACKING_LIST, EMERGENCY_CONTACTS } from '../constants';
 
@@ -6,7 +5,7 @@ const InfoTab: React.FC = () => {
 
   const getAirportData = (route: string) => {
     // Use Regex to find all 3-letter airport codes (e.g., TPE, CNX)
-    // This is safer than splitting by special characters like ➔
+    // This correctly handles "TPE ➔ CNX" and "CNX ➔ TPE" regardless of arrow char
     const matches = route.match(/([A-Z]{3})/g);
     
     const fromCode = matches && matches[0] ? matches[0] : '???';
