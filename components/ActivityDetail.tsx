@@ -113,7 +113,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
          <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
              <div className="flex items-center gap-2 mb-3 text-accent-lime">
                  <i className="fas fa-circle-info"></i>
-                 <span className="text-xs font-bold uppercase tracking-wider">景點說明</span>
+                 <span className="text-xs font-bold uppercase tracking-wider">說明</span>
              </div>
              {hasEnrichedData ? (
                  <p className="text-text-secondary leading-relaxed font-light text-justify text-sm">
@@ -133,7 +133,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
              <div className="bg-red-500/10 p-5 rounded-2xl border border-red-500/20">
                  <div className="flex items-center gap-2 mb-2 text-red-400">
                      <i className="fas fa-exclamation-circle"></i>
-                     <span className="text-xs font-bold uppercase tracking-wider">Reservation</span>
+                     <span className="text-xs font-bold uppercase tracking-wider">訂位資訊</span>
                  </div>
                  <p className="text-red-200 text-sm leading-relaxed">{activity.reservationInfo}</p>
              </div>
@@ -145,7 +145,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activity, weather, onCl
                  <div className="bg-app-surface p-5 rounded-2xl border border-white/5">
                      <div className="flex items-center gap-2 mb-3 text-yellow-500">
                          <i className="fas fa-triangle-exclamation"></i>
-                         <span className="text-xs font-bold uppercase tracking-wider">注意事項 (Notes)</span>
+                         <span className="text-xs font-bold uppercase tracking-wider">注意事項</span>
                      </div>
                      <ul className="space-y-2">
                          {activity.notes.map((note, idx) => (

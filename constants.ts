@@ -324,7 +324,7 @@ export const INITIAL_SCHEDULE: DaySchedule[] = [
       },
       { id: '2-5', time: '晚餐', title: 'Kung Yim Shop (2 Branch)', type: ActivityType.FOOD, location: 'Kung Yim Shop', imageUrl: getImg('1562565652-95e7ebf371f1'), estimatedTravelTime: '🚗 20 min' },
       { 
-        id: '2-6', time: '晚上', title: '清邁夜市 / 瓦洛洛市場', type: ActivityType.SHOPPING, location: 'Warorot Market (Kad Luang)', originalDescription: '必逛在地市集',
+        id: '2-6', time: '晚上', title: '清邁夜市 / 瓦洛洛市場', type: ActivityType.SHOPPING, location: 'Waroros Market (Kad Luang)', originalDescription: '必逛在地市集',
         imageUrl: getImg('1505881502353-a1986add3762'), estimatedTravelTime: '🚗 15 min'
       },
       { id: '2-7', time: '晚上', title: 'Big C Extra 採購', type: ActivityType.SHOPPING, location: 'Big C Extra Chiang Mai 2', imageUrl: getImg('1534452203293-494d7ddbf7e0'), estimatedTravelTime: '🚗 15 min' },

@@ -1,7 +1,7 @@
 import { Activity } from "../types";
 import { ACTIVITY_DETAILS } from "../constants";
 
-// Error class kept for compatibility, though not strictly needed for static mode
+// Error class kept for compatibility
 export class QuotaExceededError extends Error {
   constructor(message: string) {
     super(message);
@@ -9,45 +9,54 @@ export class QuotaExceededError extends Error {
   }
 }
 
-// Precise Forecast Data (Source: AccuWeather provided by user)
-const ACCUWEATHER_DATA: Record<string, { range: string, icon: string }> = {
-    '2025-11-28': { range: '12-27°C', icon: '🌤️' }, // Mostly sunny and nice
-    '2025-11-29': { range: '14-28°C', icon: '⛅' }, // Sunshine and a few clouds
-    '2025-11-30': { range: '17-29°C', icon: '☀️' }, // Plenty of sun
-    '2025-12-01': { range: '18-30°C', icon: '☀️' }, // Plenty of sun
-    '2025-12-02': { range: '19-31°C', icon: '⛅' }  // Clear to partly cloudy
+// 資料來源：泰國氣象局 (Thai Meteorological Department) 11月歷史氣候與預報
+// Updated to match specific AccuWeather screenshot values provided by user
+const THAI_MET_DEPT_DATA: Record<string, { range: string; icon: string }> = {
+  "2025-11-28": { range: "13-27°C", icon: "⛅" }, // Day 1: Partly Cloudy
+  "2025-11-29": { range: "12-27°C", icon: "☀️" }, // Day 2: Clear
+  "2025-11-30": { range: "12-28°C", icon: "☀️" }, // Day 3: Clear
+  "2025-12-01": { range: "14-29°C", icon: "☀️" }, // Day 4: Clear
+  "2025-12-02": { range: "15-29°C", icon: "☀️" }, // Day 5: Clear
 };
 
+// 預設的行程補充資訊（抓不到時的 fallback）
 const FALLBACK_ENRICHMENT = {
-    aiDescription: "暫無詳細資訊",
-    openingHours: "依現場公告為準",
-    notes: [],
-    mustEat: [],
-    mustBuy: [],
-    tips: [],
-    reservationInfo: "",
-    estimatedTravelTime: ""
+  aiDescription: "暫無詳細資訊",
+  openingHours: "依現場公告為準",
+  notes: [] as string[],
+  mustEat: [] as string[],
+  mustBuy: [] as string[],
+  tips: [] as string[],
+  reservationInfo: "",
+  estimatedTravelTime: "",
 };
 
-// Function to predict weather for a specific date (STATIC MOCK - No API Key needed)
-export const predictWeather = async (date: string): Promise<{ range: string, icon: string }> => {
-    // Return precise manual data immediately
-    if (ACCUWEATHER_DATA[date]) {
-        return ACCUWEATHER_DATA[date];
-    }
-    return { range: '20-28°C', icon: '☀️' };
-};
-
-// Function to enrich activity (STATIC MOCK - No API Key needed)
-export const enrichActivity = async (activity: Activity, previousLocation?: string): Promise<Partial<Activity>> => {
-  // Look up pre-generated details from constants.ts
-  const details = ACTIVITY_DETAILS[activity.id];
-  
-  if (details) {
-      // Simulate a tiny network delay for realism (optional)
-      // await new Promise(resolve => setTimeout(resolve, 50)); 
-      return details;
+// 完全不串 API 的 predictWeather：只看你手動的表，其他一律用通用 fallback
+export const predictWeather = async (
+  date: string
+): Promise<{ range: string; icon: string }> => {
+  // 如果在你手動設定的清單裡，直接用那一筆（最準）
+  if (THAI_MET_DEPT_DATA[date]) {
+    return THAI_MET_DEPT_DATA[date];
   }
-  
+
+  // 其他日期：給一個你覺得「清邁大致合理」的通用預設
+  return {
+    range: "20-28°C",
+    icon: "☀️",
+  };
+};
+
+// 行程 enrich（保持原本邏輯，讀取靜態資料）
+export const enrichActivity = async (
+  activity: Activity,
+  previousLocation?: string
+): Promise<Partial<Activity>> => {
+  const details = ACTIVITY_DETAILS[activity.id];
+
+  if (details) {
+    return details;
+  }
+
   return FALLBACK_ENRICHMENT;
 };
